@@ -2,112 +2,214 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import '../Styles/analytics.css';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import LeaderboardIcon from '@mui/icons-material/Leaderboard';
+import HomeIcon from '@mui/icons-material/Home';
 
 const Analytics = () => {
   const { exam } = useParams();
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
-  const [examDetails, setExamDetails] = useState({});
+
+  const [loading, setLoading] = useState(true);
+  const [examDetails, setExamDetails] = useState(null);
   const [questions, setQuestions] = useState([]);
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState(null);
   const [answers, setAnswers] = useState([]);
-  const [score, setScore] = useState(0);
-  const [accuracy, setAccuracy] = useState(0);
-  const [marks,setMarks]=useState(0);
-  const [totalMarks,setTotalMarks]=useState(0);
-  const navigate=useNavigate();
+  const [stats, setStats] = useState({
+    score: 0,
+    totalMarks: 0,
+    obtainedMarks: 0,
+    accuracy: 0,
+    correctCount: 0,
+    wrongCount: 0,
+    unattemptedCount: 0
+  });
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const res1 = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/${exam}/getQuestions`, {
+        // 1. Fetch Questions for the Exam
+        const resQuestions = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/${exam}/getQuestions`, {
           withCredentials: true,
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (res1.data.got) {
-          const questionsFetched = res1.data.questions;
-          const examInfo = res1.data.Nowexam;
-          const user = res1.data.puser;
+        if (resQuestions.data.got) {
+          const fetchedQuestions = resQuestions.data.questions; // Likely sorted by questionNo
+          const examInfo = resQuestions.data.Nowexam;
+          const user = resQuestions.data.puser;
 
-          const res2 = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/${examInfo.examName}/getAnswers`, {
+          // 2. Fetch User's Answers
+          const resAnswers = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/${examInfo.examName}/getAnswers`, {
             withCredentials: true,
             headers: { Authorization: `Bearer ${token}` },
           });
 
-          if (res2.data.got) {
-            const userAnswers = res2.data.answersq.answersAll;
-            console.log("user:",userAnswers);
+          if (resAnswers.data.got) {
+            // answersAll is an array of answers. 
+            // Assuming index 0 matches Question 1, index 1 matches Question 2, etc.
+            const userAnswers = resAnswers.data.answersq.answersAll;
+
             let correctCount = 0;
-            let correctMarks=0;
-            let tm=0;
-            questionsFetched.forEach((q, i) => {
-              if (userAnswers[i] && userAnswers[i].trim().toLowerCase() === q.qAnswer.trim().toLowerCase()) {
+            let obtainedMarks = 0;
+            let totalMarks = 0;
+            let unattemptedCount = 0;
+
+            fetchedQuestions.forEach((q, i) => {
+              totalMarks += q.marks;
+              const userAns = userAnswers[i];
+
+              if (!userAns || userAns.trim() === "") {
+                unattemptedCount++;
+              } else if (userAns.trim().toLowerCase() === q.qAnswer.trim().toLowerCase()) {
                 correctCount++;
-                correctMarks=correctMarks+q.marks;
+                obtainedMarks += q.marks;
               }
-              tm=tm+q.marks;
             });
 
-            const totalQuestions = questionsFetched.length;
-            const percentage = (correctCount / totalQuestions) * 100;
-            setTotalMarks(tm);
-            setQuestions(questionsFetched);
-            setMarks(correctMarks);
+            const wrongCount = fetchedQuestions.length - correctCount - unattemptedCount;
+            const accuracy = (correctCount / fetchedQuestions.length) * 100;
+
+            setQuestions(fetchedQuestions);
+            setAnswers(userAnswers);
             setExamDetails(examInfo);
             setUserData(user);
-            setAnswers(userAnswers);
-            setScore(correctCount);
-            setAccuracy(percentage.toFixed(2));
-            const numberUnattempted=userAnswers.filter(ans=>!ans || ans.trim()==="").length;
+            setStats({
+              score: correctCount,
+              totalMarks,
+              obtainedMarks,
+              accuracy: accuracy.toFixed(1),
+              correctCount,
+              wrongCount,
+              unattemptedCount
+            });
+
+            // Post Analytics to backend (Idempotent check handled by backend)
             const newAnalytic = {
               examId: examInfo._id,
               examWho: user.username,
-              totalQ: totalQuestions,
+              totalQ: fetchedQuestions.length,
               correctQ: correctCount,
               duration: examInfo.duration,
-              marks:correctMarks,
-              unattempted: numberUnattempted,
+              marks: obtainedMarks,
+              unattempted: unattemptedCount,
             };
-            const res3=await axios.post(`${import.meta.env.VITE_API_BASE_URL}/postAnalytics`,{newana:newAnalytic},{
-                withCredentials:true,
-                headers:{
-                    Authorization:`Bearer ${token}`
-                }
-            })
+
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/postAnalytics`, { newana: newAnalytic }, {
+              withCredentials: true,
+              headers: { Authorization: `Bearer ${token}` }
+            });
           }
         }
       } catch (err) {
         console.error("Failed to fetch analytics", err);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchAnalytics();
   }, [exam, token]);
 
+  if (loading) {
+    return <div className="analytics-page-container" style={{ justifyContent: 'center', alignItems: 'center' }}><h2>Loading Analytics...</h2></div>;
+  }
+
+  if (!examDetails || !userData) {
+    return <div className="analytics-page-container"><h2>Error loading analytics data.</h2></div>;
+  }
+
+  const percentage = (stats.obtainedMarks / stats.totalMarks) * 100;
+
   return (
-    <div className="analytics-container">
-      <h1 className="analytics-title">Exam Analytics</h1>
-      <div className="analytics-summary">
-        <div><strong>Student:</strong> {userData.username}</div>
-        <div><strong>Exam Name:</strong> {examDetails.examName}</div>
-        <div><strong>Total Questions:</strong> {questions.length}</div>
-        <div><strong>Marks Scored:</strong>{marks}/{totalMarks}</div>
-        <div><strong>Correct Answers:</strong> {score}</div>
-        <div><strong>Accuracy:</strong> {accuracy}%</div>
-        <div><strong>Duration:</strong> {examDetails.duration} minutes</div>
+    <div className="analytics-page-container">
+      {/* Header */}
+      <div className="analytics-header">
+        <div className="header-info">
+          <h1><AssessmentIcon fontSize="large" sx={{ color: '#3b82f6' }} /> Exam Results</h1>
+          <p><strong>{examDetails.examName}</strong> • Candidate: {userData.username}</p>
+        </div>
+        <div className="header-actions">
+          <button onClick={() => navigate(`/${examDetails._id}/analytics/leaderboard`)}>
+            <LeaderboardIcon /> Leaderboard
+          </button>
+          <button onClick={() => navigate('/home')} style={{ background: '#64748b' }}>
+            <HomeIcon /> Home
+          </button>
+        </div>
       </div>
 
-      <div className="analytics-breakdown">
-        <div className="shown">
-          <h2>Question-wise Analysis</h2>
-          <button onClick={()=>navigate(`/${examDetails._id}/analytics/leaderboard`)}>View LeaderBoard</button>
-        </div>
-        {questions.map((q, idx) => (
-          <div key={q._id} className={`question-block ${answers[idx]?.trim().toLowerCase() === q.qAnswer.trim().toLowerCase() ? 'correct' : 'wrong'}`}>
-            <p><strong>Q{q.questionNo}:</strong> {q.question}</p>
-            <p><strong>Your Answer:</strong> {answers[idx] || "Not Answered"}</p>
-            <p><strong>Correct Answer:</strong> {q.qAnswer}</p>
+      <div className="analytics-dashboard">
+        {/* Score Card */}
+        <div className="score-card">
+          <div className="score-circle" style={{ background: `conic-gradient(#3b82f6 ${percentage}%, #e2e8f0 ${percentage}%)` }}>
+            <div className="score-value">{Math.round(percentage)}%</div>
           </div>
-        ))}
+          <div className="score-label">Score: {stats.obtainedMarks} / {stats.totalMarks}</div>
+          <p style={{ color: percentage >= 50 ? '#10b981' : '#ef4444', fontWeight: '600' }}>
+            {percentage >= 50 ? "Excellent Work!" : "Need Improvement"}
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="stats-grid">
+          <div className="stat-card correct">
+            <h4>Correct</h4>
+            <p>{stats.correctCount}</p>
+          </div>
+          <div className="stat-card wrong">
+            <h4>Wrong</h4>
+            <p>{stats.wrongCount}</p>
+          </div>
+          <div className="stat-card unattempted">
+            <h4>Unattempted</h4>
+            <p>{stats.unattemptedCount}</p>
+          </div>
+          <div className="stat-card time">
+            <h4>Accuracy</h4>
+            <p>{stats.accuracy}%</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Question Analysis */}
+      <div className="analysis-section">
+        <h2>Question Analysis</h2>
+        <div className="question-review-list">
+          {questions.map((q, idx) => {
+            const userAns = answers[idx];
+            const isCorrect = userAns && userAns.trim().toLowerCase() === q.qAnswer.trim().toLowerCase();
+            const isUnattempted = !userAns || userAns.trim() === "";
+
+            let statusClass = "wrong";
+            let statusText = "Wrong";
+            if (isCorrect) { statusClass = "correct"; statusText = "Correct"; }
+            else if (isUnattempted) { statusClass = "unattempted"; statusText = "Not Attempted"; }
+
+            return (
+              <div key={q._id} className="review-item">
+                <div className="review-header">
+                  <span className="q-number">Question {q.questionNo}</span>
+                  <span className={`q-status ${statusClass}`}>{statusText}</span>
+                </div>
+                <div className="review-question">{q.question}</div>
+                <div className="review-answers">
+                  <div className="ans-block">
+                    <span className="ans-label">Your Answer</span>
+                    <span className={`ans-text ${isCorrect ? 'correct' : 'user-wrong'}`}>
+                      {isUnattempted ? "-" : userAns}
+                    </span>
+                  </div>
+                  <div className="ans-block">
+                    <span className="ans-label">Correct Answer</span>
+                    <span className="ans-text correct">{q.qAnswer}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

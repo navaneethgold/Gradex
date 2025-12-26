@@ -1,11 +1,8 @@
 .home-page {
-  position: fixed;
-  top: 11vh;
-  left: 215px;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
-  padding: 20px;
+  /* Removed fixed positioning to allow natural flow in main-content */
+  width: 100%;
+  min-height: 100%;
+  padding: 2rem;
   background: linear-gradient(to bottom, #d5e6f7, #e2e8f0);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #2c3e50;
@@ -121,6 +118,7 @@
 }
 
 /* Optional: Custom scroll behavior */
+/* We can remove or keep this, but main scrolling is now on body/html */
 .home-page::-webkit-scrollbar {
   width: 6px;
 }
@@ -132,14 +130,13 @@
 
 
 @media (max-width:480px) {
-  .home-page{
-    left: 60px;
-    top: 8vh;
-  }
-  #cont{
+
+  /* Removed fixed pos overrides as they are no longer needed */
+  #cont {
     width: 70%;
   }
-  .summary-chart{
+
+  .summary-chart {
     min-width: 300px;
   }
 }

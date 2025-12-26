@@ -28,7 +28,7 @@ const Home = () => {
   const [allExams, setallExams] = useState([]);
   const [grpNames, setgrpNames] = useState({});
   const [allAnalytics, setAllAnalytics] = useState([]);
-  const [organised,setOrganised]=useState([]);
+  const [organised, setOrganised] = useState([]);
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -195,12 +195,12 @@ const Home = () => {
               <p><strong>Groups:</strong> {exam.groups.map((grp) => grpNames[grp] || grp).join(", ")}</p>
               <p><strong>Duration:</strong> {exam.duration} minutes</p>
               <p><strong>Created on:</strong> {new Date(exam.createtime).toLocaleString()}</p>
-              {!exam.submitted && (
+              {!exam.submitted.includes(userData.userId) && (
                 <button className="start-btn" onClick={() => startExam(exam._id)}>
-                  {exam.endTime === null ? "Start Exam" : "Resume Exam"}
+                  {exam.endTime.includes(userData.username) ? "Resume Exam" : "Start Exam"}
                 </button>
               )}
-              {exam.submitted && (
+              {exam.submitted.includes(userData.userId) && (
                 <div className="completed-section">
                   <button className="start-btn completed">Exam Completed</button>
                   <button className="start-btn view-analytics" onClick={() => navigate(`/${exam._id}/analytics`)}>View Analytics</button>
@@ -214,24 +214,24 @@ const Home = () => {
       </div>
       <h1 className="exam-heading">Exams Organised by You</h1>
       <div className="organised">
-          <div className="exam-grid">
-        {organised.length > 0 ? (
-          organised.map((exam) => (
-            <div className="exam-card" key={exam._id}>
-              <h2>{exam.examName}</h2>
-              <p><strong>Created by:</strong> {exam.createdBy}</p>
-              <p><strong>Groups:</strong> {exam.groups.map((grp) => grpNames[grp] || grp).join(", ")}</p>
-              <p><strong>Duration:</strong> {exam.duration} minutes</p>
-              <p><strong>Created on:</strong> {new Date(exam.createtime).toLocaleString()}</p>
-              <div className="completed-section">
-                <button className="start-btn view-analytics" onClick={() => navigate(`/${exam._id}/analytics/leaderboard`)}>View Analytics</button>
+        <div className="exam-grid">
+          {organised.length > 0 ? (
+            organised.map((exam) => (
+              <div className="exam-card" key={exam._id}>
+                <h2>{exam.examName}</h2>
+                <p><strong>Created by:</strong> {exam.createdBy}</p>
+                <p><strong>Groups:</strong> {exam.groups.map((grp) => grpNames[grp] || grp).join(", ")}</p>
+                <p><strong>Duration:</strong> {exam.duration} minutes</p>
+                <p><strong>Created on:</strong> {new Date(exam.createtime).toLocaleString()}</p>
+                <div className="completed-section">
+                  <button className="start-btn view-analytics" onClick={() => navigate(`/${exam._id}/analytics/leaderboard`)}>View Analytics</button>
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <p>No exams available yet.</p>
-        )}
-      </div>
+            ))
+          ) : (
+            <p>No exams available yet.</p>
+          )}
+        </div>
       </div>
     </div>
   );

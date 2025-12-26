@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import "../Styles/StartExam.css";
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 const ExamStart = () => {
   const { name } = useParams();
@@ -11,10 +15,10 @@ const ExamStart = () => {
   const [questions, setQuestions] = useState([]);
   const [examDetails, setExamDetails] = useState();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState({id:name});
+  const [answers, setAnswers] = useState({ id: name });
   const [timeLeft, setTimeLeft] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const [totalMarks,settotalMarks]=useState(0);
+  const [totalMarks, settotalMarks] = useState(0);
 
   useEffect(() => {
     const getQuestions = async () => {
@@ -26,9 +30,9 @@ const ExamStart = () => {
         if (res.data.got) {
           setQuestions(res.data.questions);
           setExamDetails(res.data.Nowexam);
-          let marks=0;
-          for(const ques of res.data.questions){
-            marks=marks+ques.marks;
+          let marks = 0;
+          for (const ques of res.data.questions) {
+            marks = marks + ques.marks;
           }
           settotalMarks(marks);
           const duration = res.data.Nowexam.duration * 60;
@@ -53,7 +57,9 @@ const ExamStart = () => {
   }, []);
 
   useEffect(() => {
-    if (timeLeft===null || timeLeft <= 0){
+    if (timeLeft === null) return;
+    if (timeLeft <= 0) {
+      handleSubmit();
       return;
     }
     const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
@@ -63,11 +69,6 @@ const ExamStart = () => {
   const handleAnswerChange = (questionNo, value) => {
     setAnswers((prev) => ({ ...prev, [questionNo]: value }));
   };
-  useEffect(() => {
-    if (timeLeft === 0) {
-      handleSubmit(); // Auto-submit exactly once
-    }
-  }, [timeLeft]);
 
   const handleNext = () => {
     if (currentIndex < questions.length - 1) setCurrentIndex(currentIndex + 1);
@@ -77,106 +78,162 @@ const ExamStart = () => {
     if (currentIndex > 0) setCurrentIndex(currentIndex - 1);
   };
 
-const handleSubmit = async () => {
-  if (submitted) return;
-  setSubmitted(true);
+  const handleSubmit = async () => {
+    if (submitted) return;
+    setSubmitted(true);
 
-  try {
-    console.log(answers);
-    const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/${name}/submitAnswers`, { answers }, {
-      withCredentials: true,
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    if (res.data.sub) {
-      const res2 = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/${name}/submitted`, {}, {
+    try {
+      console.log(answers);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/${name}/submitAnswers`, { answers }, {
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      if (res2.data.sub) {
-        alert("Exam submitted successfully!");
-      }
-    }
+      if (res.data.sub) {
+        const res2 = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/${name}/submitted`, {}, {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` }
+        });
 
-    navigate("/home");
-  } catch (err) {
-    console.error(err);
-    alert("Error submitting exam.");
-  }
-};
+        if (res2.data.sub) {
+          alert("Exam submitted successfully!");
+        }
+      }
+
+      navigate("/home");
+    } catch (err) {
+      console.error(err);
+      alert("Error submitting exam.");
+    }
+  };
 
   const formatTime = (seconds) => {
+    if (seconds < 0) return "00:00";
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (!questions.length || !examDetails) return <div className="exam-interface">Loading...</div>;
+  if (!questions.length || !examDetails) return (
+    <div className="exam-interface" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <h2>Loading Exam...</h2>
+    </div>
+  );
 
   const currentQ = questions[currentIndex];
+  const isUrgent = timeLeft && timeLeft < 60; // Less than 1 minute
 
   return (
-    <div className="exam-interface">
-      <div className="header">
-          <div className="timer">Time Left: {formatTime(timeLeft)}</div>
-          <div className="marks">Total Marks: {totalMarks}</div>
-          <div className="preq">This Question carries {currentQ.marks} marks</div>
-      </div>
-      
-      <div className="question-box">
-        <h3>Q{currentQ.questionNo}: {currentQ.question}</h3>
-        {currentQ.questionsType === "MCQ" && (
-          <div className="options">
-            {currentQ.additional.map((opt, i) => (
-                <div className="eachop">
-                <input
-                  type="radio"
-                  name={`q${currentQ.questionNo}`}
-                  value={opt}
-                  checked={answers[currentQ.questionNo] === opt}
-                  style={{margin:0, width:"0.75rem",marginRight:"0.5rem"}}
-                  onChange={(e) => handleAnswerChange(currentQ.questionNo, e.target.value)}
-                  className="mcqinput"
-                />
-                <label key={i} className="option-label">{opt}</label>
-                </div>
-                
-              
-            ))}
-          </div>
-        )}
-        {currentQ.questionsType === "TrueFalse" && (
-          <div className="options">
-            {["True", "False"].map((val) => (
-              <label key={val} className="option-label">
-                <input
-                  type="radio"
-                  name={`q${currentQ.questionNo}`}
-                  value={val}
-                  checked={answers[currentQ.questionNo] === val}
-                  style={{margin:0, width:"0.75rem",marginRight:"0.5rem"}}
-                  onChange={(e) => handleAnswerChange(currentQ.questionNo, e.target.value)}
-                />
-                {val}
-              </label>
-            ))}
-          </div>
-        )}
-        {currentQ.questionsType === "FillBlank" && (
-          <input
-            className="blank-input"
-            type="text"
-            value={answers[currentQ.questionNo] || ""}
-            onChange={(e) => handleAnswerChange(currentQ.questionNo, e.target.value)}
-          />
-        )}
-        <div className="nav-buttons">
-          {!examDetails.linearity && <button disabled={currentIndex === 0} onClick={handlePrev}>Previous</button>}
-          <button disabled={currentIndex === questions.length - 1} onClick={handleNext}>Next</button>
+    <div className="exam-page-container">
+      {/* Sticky Header */}
+      <div className="exam-header">
+        <div className="exam-title">
+          <h2>{examDetails.examName}</h2>
         </div>
-        <div className="submit-btn">
-          <button onClick={handleSubmit}>Submit Exam</button>
+        <div className="exam-stats">
+          <div className="stat-item">
+            <span>Total Marks:</span>
+            <strong>{totalMarks}</strong>
+          </div>
+          <div className={`stat-item timer ${isUrgent ? 'urgent' : ''}`}>
+            <AccessTimeIcon fontSize="small" />
+            <span>{formatTime(timeLeft)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable Content */}
+      <div className="exam-content">
+        <div className="question-card">
+          <div className="question-header">
+            <span className="question-badge">Question {currentIndex + 1} of {questions.length}</span>
+            <span className="question-marks">{currentQ.marks} marks</span>
+          </div>
+
+          <div className="question-text">
+            <h3>{currentQ.question}</h3>
+          </div>
+
+          {/* Question Type: MCQ */}
+          {currentQ.questionsType === "MCQ" && (
+            <div className="options-list">
+              {currentQ.additional.map((opt, i) => (
+                <div
+                  key={i}
+                  className={`option-item ${answers[currentQ.questionNo] === opt ? 'selected' : ''}`}
+                  onClick={() => handleAnswerChange(currentQ.questionNo, opt)}
+                >
+                  <input
+                    type="radio"
+                    name={`q${currentQ.questionNo}`}
+                    value={opt}
+                    checked={answers[currentQ.questionNo] === opt}
+                    onChange={() => { }} // Controlled by div click
+                    className="option-radio"
+                  />
+                  <span className="option-text">{opt}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Question Type: True/False */}
+          {currentQ.questionsType === "TrueFalse" && (
+            <div className="options-list">
+              {["True", "False"].map((val) => (
+                <div
+                  key={val}
+                  className={`option-item ${answers[currentQ.questionNo] === val ? 'selected' : ''}`}
+                  onClick={() => handleAnswerChange(currentQ.questionNo, val)}
+                >
+                  <input
+                    type="radio"
+                    name={`q${currentQ.questionNo}`}
+                    value={val}
+                    checked={answers[currentQ.questionNo] === val}
+                    onChange={() => { }}
+                    className="option-radio"
+                  />
+                  <span className="option-text">{val}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Question Type: Fill in the Blank */}
+          {currentQ.questionsType === "FillBlank" && (
+            <div className="input-area">
+              <textarea
+                className="text-answer-input"
+                placeholder="Type your answer here..."
+                value={answers[currentQ.questionNo] || ""}
+                onChange={(e) => handleAnswerChange(currentQ.questionNo, e.target.value)}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sticky Footer */}
+      <div className="exam-footer">
+        <div className="nav-controls">
+          {!examDetails.linearity && (
+            <button className="btn-nav" disabled={currentIndex === 0} onClick={handlePrev}>
+              <ArrowBackIcon fontSize="small" /> Previous
+            </button>
+          )}
+        </div>
+
+        <div className="nav-controls">
+          {currentIndex < questions.length - 1 ? (
+            <button className="btn-nav" onClick={handleNext}>
+              Next <ArrowForwardIcon fontSize="small" />
+            </button>
+          ) : (
+            <button className="btn-submit" onClick={handleSubmit}>
+              <CheckCircleOutlineIcon fontSize="small" /> Submit Exam
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -1,154 +1,240 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@400;700&display=swap');
-body {
-  font-family: 'Poppins', sans-serif;
-}
-.indiGroup {
-  position: fixed;
-  top: 11vh;
-  left: 215px; /* Sidebar width */
-  width: calc(100% - 215px);
+/* particularGroup.css */
+
+.group-details-container {
+  width: 100%;
+  min-height: 100%;
   padding: 2rem;
-  background: linear-gradient(to bottom, #d5e6f7, #e2e8f0);
-  height: calc(100vh - 11vh);
-  overflow-y: auto;
+  background: #f8fafc;
+  font-family: 'Montserrat', sans-serif;
+  color: #1e293b;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-#gc{
-  background: linear-gradient(to right, #2563eb, #3b82f6);
-  width: 10rem;
-  color: white;
-}
-.indiGroup p{
-  font-family: 'Montserrat', sans-serif;
-}
-.indiGroup h2 {
-  margin-bottom: 1rem;
-  font-family: 'Montserrat', sans-serif;
+  gap: 2rem;
 }
 
-.indiGroup p {
-  font-size: 1.1rem;
-  margin-bottom: 0.75rem;
-}
-
-.add-member-container {
-  margin-top: 2rem;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-.add-member-container input {
-  padding: 0.5rem;
-  font-size: 1rem;
-  width: 40%;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.add-member-container button {
-  padding: 0.5rem 1.2rem;
-  background: linear-gradient(to right, #2563eb, #3b82f6);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.add-member-container button:hover {
-  background-color: #1e4fd1;
-}
-
-.flash {
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  border-radius: 5px;
-  font-weight: bold;
-}
-
-.flash.success {
-  background-color: #d1fae5;
-  color: #065f46;
-  border: 1px solid #10b981;
-}
-
-.flash.error {
-  background-color: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #ef4444;
-}
-h3{
-  margin-top: 1.5rem;
-}
-.members-list {
-  border-top: 1px solid #ccc;
-  padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-  gap: 0.75rem;
-}
-
-.member-row {
+/* Header Card */
+.details-header-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.6rem 1rem;
-  background-color: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s ease;
+  flex-wrap: wrap;
+  gap: 1.5rem;
 }
 
-.member-row:hover {
-  background-color: #f1f5f9;
+.group-info h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.member-row span {
+.back-btn-icon {
+  cursor: pointer;
+  color: #64748b;
+  transition: color 0.2s;
+}
+
+.back-btn-icon:hover {
+  color: #3b82f6;
+}
+
+.group-meta {
+  color: #64748b;
   font-size: 1rem;
-  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.remove-btn {
-  background-color: #ef4444;
+.btn-group-chat {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   border: none;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.9rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+}
+
+.btn-group-chat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+}
+
+/* Dashboard Grid */
+.group-dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.dashboard-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header-title {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+}
+
+.card-header-title h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Members List */
+.members-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.member-item:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #334155;
+  font-weight: 500;
+}
+
+.loading-text,
+.error-text {
+  text-align: center;
+  margin-top: 4rem;
+  font-size: 1.1rem;
+  color: #64748b;
+}
+
+/* Add Member Form */
+.add-member-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.add-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.add-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-add-member {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-add-member:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.btn-add-member:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-remove-member {
+  background: transparent;
+  color: #ef4444;
+  border: none;
+  padding: 0.5rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
 }
 
-.remove-btn:hover {
-  background-color: #dc2626;
+.btn-remove-member:hover {
+  background: #fee2e2;
 }
 
-@media (max-width:480px) {
-  .indiGroup {
-    position: fixed;
-    top: 8vh;
-    left: 60px; /* Sidebar width */
-    width: calc(100% - 60px);
-    padding: 1rem;
-    background: linear-gradient(to bottom, #d5e6f7, #e2e8f0);
-    height: calc(100vh - 8vh);
-    overflow-y: auto;
+/* Responsiveness */
+@media (max-width: 900px) {
+  .group-dashboard-grid {
+    grid-template-columns: 1fr;
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  .add-member-container{
+    flex-direction: column-reverse;
+    /* Put Actions on top? No, members list is usually more important to see. Actions can be below. */
     flex-direction: column;
   }
-  .add-member-container input{
-    width: 90%;
+}
+
+@media (max-width: 480px) {
+  .group-details-container {
+    padding: 1rem;
   }
-  .members-list{
-    width: 100%;
+
+  .details-header-card {
+    padding: 1.5rem;
+  }
+
+  .group-info h2 {
+    font-size: 1.5rem;
   }
 }

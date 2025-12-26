@@ -6,7 +6,8 @@ import Flash from "./flash";
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
-import Divider from '@mui/material/Divider';
+import SettingsIcon from '@mui/icons-material/Settings';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 const Settings = () => {
     const token = localStorage.getItem("token");
@@ -16,6 +17,7 @@ const Settings = () => {
     const navigate = useNavigate();
 
     const deleteorganQuizHistory = async () => {
+        if (!confirm("Are you sure you want to delete all organized quizzes? This cannot be undone.")) return;
         try {
             const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteOrganQuizes`, {
                 withCredentials: true,
@@ -36,6 +38,7 @@ const Settings = () => {
     };
 
     const deleteCreatedGroups = async () => {
+        if (!confirm("Are you sure you want to delete all created groups? This cannot be undone.")) return;
         try {
             const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteCreatedGroups`, {
                 withCredentials: true,
@@ -56,6 +59,7 @@ const Settings = () => {
     };
 
     const deleteAcc = async () => {
+        if (!confirm("Are you sure you want to delete your account? This action is irreversible.")) return;
         try {
             const res1 = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteOrganQuizes`, {
                 withCredentials: true,
@@ -88,28 +92,65 @@ const Settings = () => {
     };
 
     return (
-        <div className="settin">
-            <h2>⚙️ Settings</h2>
-            <Divider sx={{ my: 2 }} />
+        <div className="settings-page-container">
+            <div className="settings-header">
+                <h2><SettingsIcon fontSize="large" /> Settings</h2>
+            </div>
 
             {show && <Flash message={flashMessage} type={type} show={show} setShow={setShow} />}
 
-            <div className="setting-option" onClick={deleteorganQuizHistory}>
-                <HistoryIcon sx={{ color: "#2c3e50", marginRight: "10px" }} />
-                <span>Delete All Organized Quizzes</span>
+            {/* General Settings Section - Placeholder for future */}
+            {/* 
+            <div>
+                <h3 className="settings-section-title">General</h3>
+                <div className="settings-card">
+                    ...
+                </div>
+            </div> 
+            */}
+
+            {/* Danger Zone Section */}
+            <div>
+                <h3 className="settings-section-title" style={{ color: '#ef4444' }}>Danger Zone</h3>
+                <div className="settings-card danger-zone-card">
+
+                    <div className="settings-option-item" onClick={deleteorganQuizHistory}>
+                        <div className="option-content">
+                            <HistoryIcon sx={{ color: "#ef4444" }} />
+                            <div className="option-text danger-text">
+                                <h3>Delete Organized Quizzes</h3>
+                                <p>Permanently remove all quizzes you have created.</p>
+                            </div>
+                        </div>
+                        <button className="btn-danger-action">Delete History</button>
+                    </div>
+
+                    <div className="settings-option-item" onClick={deleteCreatedGroups}>
+                        <div className="option-content">
+                            <DeleteIcon sx={{ color: "#ef4444" }} />
+                            <div className="option-text danger-text">
+                                <h3>Delete Created Groups</h3>
+                                <p>Permanently remove all groups you manage.</p>
+                            </div>
+                        </div>
+                        <button className="btn-danger-action">Delete Groups</button>
+                    </div>
+
+                    <div className="settings-option-item" onClick={deleteAcc}>
+                        <div className="option-content">
+                            <PersonOffIcon sx={{ color: "#ef4444" }} />
+                            <div className="option-text danger-text">
+                                <h3>Delete Account</h3>
+                                <p>Permanently delete your account and all data.</p>
+                            </div>
+                        </div>
+                        <button className="btn-danger-action delete-account-btn">Delete Account</button>
+                    </div>
+
+                </div>
             </div>
 
-            <div className="setting-option" onClick={deleteCreatedGroups}>
-                <DeleteIcon sx={{ color: "#2c3e50", marginRight: "10px" }} />
-                <span>Delete All Created Groups</span>
-            </div>
-
-            <div className="setting-option delete-account" onClick={deleteAcc}>
-                <PersonOffIcon sx={{ color: "#c0392b", marginRight: "10px" }} />
-                <span>Delete My Account</span>
-            </div>
         </div>
     );
 };
-
 export default Settings;
