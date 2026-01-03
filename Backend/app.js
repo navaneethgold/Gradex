@@ -278,8 +278,9 @@ app.post("/create-new-exam", auth, async (req, res) => {
       duration: duration,
       linearity: linear
     })
+    const owner = await user.findOne({ username: un });
     await newExam.save();
-    return res.json({ message: "success", owner: un })
+    return res.json({ message: "success", owner: owner, newExam: newExam })
   } catch (err) {
     console.log(err);
     return res.json({ message: "failure" });
@@ -359,7 +360,7 @@ app.get("/:name/getQuestions", auth, async (req, res) => {
     if (!Myexam) {
       return res.json({ message: "No exam found", got: false });
     }
-    const allQuestions = await question.find({ examName: Myexam.examName }).sort({ questionNo: 1 });
+    const allQuestions = await question.find({ examName: Myexam._id }).sort({ questionNo: 1 });
     const puser = req.user;
 
     // Process EndTime for THIS user
@@ -386,7 +387,8 @@ app.post("/:name/submitAnswers", auth, async (req, res) => {
     const myid = answers.id;
     const Myexam = await exam.findOne({ _id: myid });
     const examname = Myexam.examName;
-    const Noquestions = await question.find({ examName: examname });
+    const examid = Myexam._id;
+    const Noquestions = await question.find({ examName: examid });
     const Numberquestions = Noquestions.length;
     console.log("number of questions:", Numberquestions)
     const onlyAns = [];

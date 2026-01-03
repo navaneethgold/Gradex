@@ -22,7 +22,7 @@ function App() {
       <Routes>
         <Route path="/signUp" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        
+
         {/* Layout-wrapped routes */}
         <Route path="/" element={<Layout />}>
           {/* Redirect from "/" to "/home" */}
@@ -33,12 +33,12 @@ function App() {
           <Route path="/groups/:id" element={<Pgroup />} />
           <Route path="/groups/:id/groupChat" element={<GroupChat />} />
           <Route path="/create-exam" element={<CreateExam />} />
-          <Route path="/:un/:exam" element={<CreateInterface />} />
+          <Route path="/:unId/:examId" element={<CreateInterface />} />
           <Route path="/start-exam/:name" element={<ExamStart />} />
           <Route path="/:exam/analytics" element={<Analytics />} />
           <Route path="/:exam/analytics/leaderboard" element={<LeaderBoard />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/:un/:exam/AI" element={<GeminiAI />} />
+          <Route path="/:unId/:examId/AI" element={<GeminiAI />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>

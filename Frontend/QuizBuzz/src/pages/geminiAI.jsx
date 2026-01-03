@@ -11,7 +11,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import Flash from "./flash";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 const GeminiAI = () => {
-  const { un, exam } = useParams();
+  const { unId, examId } = useParams();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const [difficult, setdifficulty] = useState("Medium");
@@ -46,7 +46,7 @@ const GeminiAI = () => {
     try {
       console.log("help", filesPayload);
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/upload/presigned-url`, {
-        examId: exam,
+        examId: examId,
         files: filesPayload
       }, {
         withCredentials: true,
@@ -86,7 +86,7 @@ const GeminiAI = () => {
     setLoading(true);
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/generate-AI-questions`, {
-        examId: exam,
+        examId: examId,
         difficult,
         maxMarks,
         noQuestions,
@@ -97,23 +97,18 @@ const GeminiAI = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       const questions = res.data.allAiQuestions;
-      console.log("Type of allAiQuestions:", typeof res.data.allAiQuestions);
-
-      console.log(questions);
-      console.log("Type of allAiQuestions:", typeof questions);
+      console.log("questions", questions);
       for (const eachobj of questions) {
         const questionPayload = {
-          examName: exam,
+          examName: examId,
           ...eachobj,
           marks: Number(maxMarks) / Number(noQuestions)
         };
-        console.log(questionPayload);
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/create-new-exam/${exam}/create-question`, { payload: questionPayload }, {
+        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/create-new-exam/${examId}/create-question`, { payload: questionPayload }, {
           withCredentials: true
         });
       }
       setshow(true);
-      console.log("Questions generated and added successfully!");
       setflashMessage("Questions generated and added successfully!")
       setisType("success");
       setTimeout(() => {

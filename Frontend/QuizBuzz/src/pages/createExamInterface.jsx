@@ -6,11 +6,11 @@ import Flash from "./flash";
 import { useNavigate } from "react-router-dom";
 
 const CreateInterface = () => {
-  const { un, exam } = useParams();
-  const navigate=useNavigate();
+  const { unId, examId } = useParams();
+  const navigate = useNavigate();
   const [questions, setQuestions] = useState([createEmptyQuestion()]);
-  const [flashMessage,setflashMessage]=useState("");
-  const [type,setistype]=useState("");
+  const [flashMessage, setflashMessage] = useState("");
+  const [type, setistype] = useState("");
   const [showFlash, setShowFlash] = useState(false);  // global flag
 
   function createEmptyQuestion() {
@@ -18,8 +18,8 @@ const CreateInterface = () => {
       questionsType: "MCQ",
       question: "",
       additional: [""],
-      qAnswer:"",
-      marks:""
+      qAnswer: "",
+      marks: ""
     };
   }
   function showFlashMessage(msg, t = "success") {
@@ -41,14 +41,14 @@ const CreateInterface = () => {
     setQuestions(updated);
   };
 
-  const handleAnswerChange=(index,text)=>{
-    const updated=[...questions];
-    updated[index].qAnswer=text;
+  const handleAnswerChange = (index, text) => {
+    const updated = [...questions];
+    updated[index].qAnswer = text;
     setQuestions(updated);
   }
-  const handleMarksChange=(index,text)=>{
-    const updated=[...questions];
-    updated[index].marks=text;
+  const handleMarksChange = (index, text) => {
+    const updated = [...questions];
+    updated[index].marks = text;
     setQuestions(updated);
   }
 
@@ -70,14 +70,14 @@ const CreateInterface = () => {
 
   const saveQuestion = async (index) => {
     const payload = {
-      examName: exam,
-      questionNo:index+1,
-      ...questions[index]      
+      examName: examId,
+      questionNo: index + 1,
+      ...questions[index]
     };
-    if(questions[index].questionsType==="MCQ"){
-      const optionsall=questions[index].additional;
-      const ind=optionsall.indexOf(questions[index].qAnswer);
-      if(ind===-1){
+    if (questions[index].questionsType === "MCQ") {
+      const optionsall = questions[index].additional;
+      const ind = optionsall.indexOf(questions[index].qAnswer);
+      if (ind === -1) {
         setflashMessage("Answer should exist in options");
         setistype("error");
         setShowFlash(true);
@@ -86,10 +86,10 @@ const CreateInterface = () => {
     }
     console.log(payload);
     try {
-      const res=await axios.post(`${import.meta.env.VITE_API_BASE_URL}/create-new-exam/${exam}/create-question`, {payload}, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/create-new-exam/${examId}/create-question`, { payload }, {
         withCredentials: true
       });
-      if(res.data.created){
+      if (res.data.created) {
         showFlashMessage(res.data.message, "success");
       }
     } catch (err) {
@@ -102,7 +102,7 @@ const CreateInterface = () => {
   return (
     <div className="create-interface">
       <h2>Create Exam: {exam}</h2>
-      
+
 
       <div className="questions-container">
         {questions.map((q, index) => (
@@ -136,8 +136,8 @@ const CreateInterface = () => {
                 <button type="button" onClick={() => addOption(index)}>Add Option</button>
               </div>
             )}
-            <div className="qanswer"><label>Answer:</label><input type="text" placeholder="Type the answer for Evaluation" value={q.qAnswer} onChange={(e)=>{handleAnswerChange(index,e.target.value)}} required/></div>
-            <div className="marks"><label>Marks:</label><input type="number" placeholder="Marks awarded..." value={q.marks} onChange={(e)=>{handleMarksChange(index,e.target.value)}} required/></div>
+            <div className="qanswer"><label>Answer:</label><input type="text" placeholder="Type the answer for Evaluation" value={q.qAnswer} onChange={(e) => { handleAnswerChange(index, e.target.value) }} required /></div>
+            <div className="marks"><label>Marks:</label><input type="number" placeholder="Marks awarded..." value={q.marks} onChange={(e) => { handleMarksChange(index, e.target.value) }} required /></div>
             <button onClick={() => saveQuestion(index)} className="save-btn">
               Save Question
             </button>
@@ -146,7 +146,7 @@ const CreateInterface = () => {
         ))}
         <button onClick={addQuestion} className="add-question-btn">Add Question</button>
       </div>
-      <button className="add-question-btn2" onClick={()=>navigate("/home")}>Create Exam</button>
+      <button className="add-question-btn2" onClick={() => navigate("/home")}>Create Exam</button>
     </div>
   );
 };

@@ -72,7 +72,10 @@ const CreateExam = () => {
                 });
                 if (res.data.message === "success") {
                     const un = res.data.owner;
-                    navigate(`/${un}/${exam}`);
+                    const newExam = res.data.newExam;
+                    const unId = un._id;
+                    const examId = newExam._id;
+                    navigate(`/${unId}/${examId}`);
                 }
             } catch (error) {
                 console.error("Creation failed", error);
@@ -103,7 +106,10 @@ const CreateExam = () => {
                 });
                 if (res.data.message === "success") {
                     const un = res.data.owner;
-                    navigate(`/${un}/${exam}/AI`);
+                    const newExam = res.data.newExam;
+                    const examId = newExam._id;
+                    const unId = un._id;
+                    navigate(`/${unId}/${examId}/AI`);
                 }
             } catch (error) {
                 console.error("AI Creation failed", error);

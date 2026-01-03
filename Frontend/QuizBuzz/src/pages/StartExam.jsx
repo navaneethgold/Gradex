@@ -28,6 +28,7 @@ const ExamStart = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.got) {
+          console.log("Start Exam: ", res.data.questions);
           setQuestions(res.data.questions);
           setExamDetails(res.data.Nowexam);
           let marks = 0;

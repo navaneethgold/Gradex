@@ -33,5 +33,11 @@ def process_pdf(object_key):
             os.remove(local_path)
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python pdfOperations.py <object_key>", file=sys.stderr)
+        sys.exit(1)
+    
+    # Force UTF-8 encoding for stdout to handle special characters on Windows
+    sys.stdout.reconfigure(encoding='utf-8')
     object_key = sys.argv[1]
     print(process_pdf(object_key))
