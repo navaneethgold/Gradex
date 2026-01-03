@@ -17,6 +17,7 @@ import question from './models/Questions.js';
 import answer from './models/answers.js';
 import analytic from './models/analytics.js';
 import AIQuestionRoute from "./routes/gemini.js"
+import fileRoute from "./routes/fileRoutes/file.js";
 dotenv.config();
 const app = express();
 const server = createServer(app);
@@ -64,6 +65,7 @@ async function main() {
   await mongoose.connect(db_url);
 }
 app.use("/", AIQuestionRoute);
+app.use("/api/upload", fileRoute);
 
 app.post("/signUp", async (req, res) => {
   try {
