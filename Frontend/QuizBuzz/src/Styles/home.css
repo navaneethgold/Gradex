@@ -1,142 +1,280 @@
+/* home.css - Premium Dashboard Styling */
+
 .home-page {
-  /* Removed fixed positioning to allow natural flow in main-content */
   width: 100%;
   min-height: 100%;
   padding: 2rem;
-  background: linear-gradient(to bottom, #d5e6f7, #e2e8f0);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #2c3e50;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-primary);
+  /* Background logic is handled by Main Content in App.css */
 }
 
+/* Explicit Dark Mode Overrides to ensure Cards are Dark */
+[data-theme='dark'] .exam-card,
+[data-theme='dark'] .summary-card {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Headings */
 .exam-heading {
-  font-size: 28px;
-  margin: 20px 0;
-  color: #333;
-  font-weight: 600;
-  border-bottom: 2px solid #ccc;
-  padding-bottom: 8px;
-}
-
-.summary-section {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 2.5rem 0 1.5rem 0;
+  color: var(--text-primary);
   display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-  margin-bottom: 40px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.summary-chart {
+/* Dashboard Summary Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.summary-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.summary-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.chart-wrapper {
+  width: 100%;
   flex: 1;
-  min-width: 320px;
+  min-height: 250px;
 }
 
-.summary-text {
-  flex: 1;
-  min-width: 280px;
-  font-size: 16px;
-  line-height: 1.6;
-  padding-top: 10px;
+/* Stats Section */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  justify-content: center;
+  height: 100%;
 }
 
-.barchart-section {
-  margin-bottom: 40px;
-  background: #fff;
-  padding: 20px;
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  background-color: var(--bg-primary);
+  /* Contrast against Card BG */
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.barchart-section h3 {
+  border: 1px solid var(--border-color);
   text-align: center;
-  margin-bottom: 20px;
+  gap: 0.5rem;
 }
 
+.stat-item:last-child {
+  border-bottom: 1px solid var(--border-color);
+  /* Reset list style */
+}
+
+/* Dark Mode Override for Stat Items */
+[data-theme='dark'] .stat-item {
+  background-color: #0f172a !important;
+  /* Slate 900 */
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-value.highlight {
+  color: var(--accent-color);
+}
+
+
+/* Exam Grid */
 .exam-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
 .exam-card {
-  background: white;
-  padding: 16px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .exam-card:hover {
   transform: translateY(-5px);
+  scale: 1.02;
 }
 
-.exam-card h2 {
-  font-size: 20px;
-  margin-bottom: 10px;
-  color: #2c3e50;
+/* Hover Effect Border Gradient (optional subtle highlight) */
+.exam-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--accent-color);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-.exam-card p {
-  margin: 6px 0;
-  font-size: 14px;
-  color: #555;
+.exam-card:hover::after {
+  opacity: 1;
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 0.5rem;
+}
+
+.card-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.badge.duration {
+  background-color: var(--active-bg);
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+
+.badge.organiser {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+/* Card Body */
+.card-body p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0.4rem 0;
+}
+
+.card-body strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Card Footer */
+.card-footer {
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
 .start-btn {
-  margin-top: 12px;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: bold;
-  color: white;
-  background-color: #3498db;
-  border: none;
+  width: 100%;
+  padding: 0.75rem;
   border-radius: 8px;
+  background-color: var(--accent-color);
+  color: white;
+  font-weight: 600;
+  border: none;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s;
+  font-size: 0.95rem;
 }
 
 .start-btn:hover {
-  background-color: #2980b9;
+  background-color: var(--accent-hover);
 }
 
-.start-btn.completed {
-  background-color: #27ae60;
-}
-
-.start-btn.view-analytics {
-  background-color: #e67e22;
-  margin-left: 10px;
-}
-
-.completed-section {
+.completed-actions {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 10px;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-/* Optional: Custom scroll behavior */
-/* We can remove or keep this, but main scrolling is now on body/html */
-.home-page::-webkit-scrollbar {
-  width: 6px;
+.status-completed {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 0.5rem;
+  background-color: rgba(16, 185, 129, 0.1);
+  /* Green tint */
+  color: #10b981;
+  font-weight: 600;
+  border-radius: 6px;
+  font-size: 0.9rem;
 }
 
-.home-page::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 10px;
+.view-analytics-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
+.view-analytics-btn:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
 
-@media (max-width:480px) {
-
-  /* Removed fixed pos overrides as they are no longer needed */
-  #cont {
-    width: 70%;
-  }
-
-  .summary-chart {
-    min-width: 300px;
-  }
+.no-data {
+  color: var(--text-secondary);
+  font-style: italic;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px dashed var(--border-color);
 }

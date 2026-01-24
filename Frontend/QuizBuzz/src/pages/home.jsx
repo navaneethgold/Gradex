@@ -1,8 +1,9 @@
-// Updated Home Component with Analytics Summary + Bar Chart + Improved CSS
+// Updated Home Component with Analytics Summary + Bar Chart + Improvement animations
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Flash from "./flash.jsx";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   PieChart,
   Pie,
@@ -18,7 +19,7 @@ import {
 } from "recharts";
 import "../Styles/home.css";
 
-const COLORS = ["#0088FE", "#FF8042", "#00C49F"];
+const COLORS = ["#3b82f6", "#f97316", "#ef4444"]; // Blue, Orange, Red
 
 const Home = () => {
   const [isLogged, setisLogged] = useState(false);
@@ -133,107 +134,183 @@ const Home = () => {
     Accuracy: +((entry.correctQ / entry.totalQ) * 100).toFixed(2),
   }));
 
+  const containerVariants = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 1 }, // Changed opacity to 1 to guarantee visibility
+    visible: { y: 0, opacity: 1 }
+  };
+
   return (
-    <div className="home-page">
-      <h1 className="exam-heading">Your Overall Performance</h1>
-      {allAnalytics.length > 0 && (
-        <div className="summary-section">
-          <div className="summary-chart">
-            <h3>Summary</h3>
-            <ResponsiveContainer width="100%" height={250} id="cont">
-              <PieChart>
-                <Pie
-                  data={summaryData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label
-                >
-                  {summaryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="summary-text">
-            <p><strong>Total Correct Answers:</strong> {totalCorrect}</p>
-            <p><strong>Total Questions:</strong> {totalQuestions}</p>
-            <p><strong>Average Accuracy:</strong> {avgAccuracy}%</p>
-            <p><strong>Average Unattempted:</strong> {avgUnattempted}%</p>
-          </div>
-        </div>
-      )}
+    <motion.div
+      className="home-page"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
+      <motion.h1 className="exam-heading" variants={itemVariants}>Your Performance Summary</motion.h1>
 
-      {barChartData.length > 0 && (
-        <div className="barchart-section">
-          <h3>Accuracy Across Exams</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={barChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis unit="%" />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="Accuracy" fill="#8884d8" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
-
-      <h1 className="exam-heading">Your Exams</h1>
-      <div className="exam-grid">
-        {allExams.length > 0 ? (
-          allExams.map((exam) => (
-            <div className="exam-card" key={exam._id}>
-              <h2>{exam.examName}</h2>
-              <p><strong>Created by:</strong> {exam.createdBy}</p>
-              <p><strong>Groups:</strong> {exam.groups.map((grp) => grpNames[grp] || grp).join(", ")}</p>
-              <p><strong>Duration:</strong> {exam.duration} minutes</p>
-              <p><strong>Created on:</strong> {new Date(exam.createtime).toLocaleString()}</p>
-              {!exam.submitted.includes(userData.userId) && (
-                <button className="start-btn" onClick={() => startExam(exam._id)}>
-                  {exam.endTime.includes(userData.username) ? "Resume Exam" : "Start Exam"}
-                </button>
-              )}
-              {exam.submitted.includes(userData.userId) && (
-                <div className="completed-section">
-                  <button className="start-btn completed">Exam Completed</button>
-                  <button className="start-btn view-analytics" onClick={() => navigate(`/${exam._id}/analytics`)}>View Analytics</button>
-                </div>
-              )}
+      {
+        allAnalytics.length > 0 ? (
+          <motion.div className="dashboard-grid" variants={itemVariants}>
+            <div className="summary-card chart-card">
+              <h3>Overall Accuracy</h3>
+              <div className="chart-wrapper">
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={summaryData}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      label
+                    >
+                      {summaryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
+                      itemStyle={{ color: 'var(--text-primary)' }}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-          ))
-        ) : (
-          <p>No exams available yet.</p>
-        )}
-      </div>
-      <h1 className="exam-heading">Exams Organised by You</h1>
-      <div className="organised">
-        <div className="exam-grid">
-          {organised.length > 0 ? (
-            organised.map((exam) => (
-              <div className="exam-card" key={exam._id}>
-                <h2>{exam.examName}</h2>
-                <p><strong>Created by:</strong> {exam.createdBy}</p>
-                <p><strong>Groups:</strong> {exam.groups.map((grp) => grpNames[grp] || grp).join(", ")}</p>
-                <p><strong>Duration:</strong> {exam.duration} minutes</p>
-                <p><strong>Created on:</strong> {new Date(exam.createtime).toLocaleString()}</p>
-                <div className="completed-section">
-                  <button className="start-btn view-analytics" onClick={() => navigate(`/${exam._id}/analytics/leaderboard`)}>View Analytics</button>
+
+            <div className="summary-card stats-card">
+              <h3>Quick Stats</h3>
+              <div className="stats-grid">
+                <div className="stat-item">
+                  <span className="stat-label">Total Questions</span>
+                  <span className="stat-value">{totalQuestions}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Total Correct</span>
+                  <span className="stat-value">{totalCorrect}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-label">Avg. Accuracy</span>
+                  <span className="stat-value highlight">{avgAccuracy}%</span>
                 </div>
               </div>
-            ))
-          ) : (
-            <p>No exams available yet.</p>
-          )}
-        </div>
-      </div>
-    </div>
+            </div>
+
+            {barChartData.length > 0 && (
+              <div className="summary-card chart-card full-width">
+                <h3>Progress Over Time</h3>
+                <div className="chart-wrapper">
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={barChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
+                      <XAxis dataKey="name" stroke="var(--text-secondary)" />
+                      <YAxis unit="%" stroke="var(--text-secondary)" />
+                      <Tooltip
+                        cursor={{ fill: 'var(--hover-bg)' }}
+                        contentStyle={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
+                        itemStyle={{ color: 'var(--text-primary)' }}
+                      />
+                      <Bar dataKey="Accuracy" fill="var(--accent-color)" radius={[6, 6, 0, 0]} barSize={40} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <motion.div className="dashboard-grid" variants={itemVariants}>
+            <div className="summary-card full-width" style={{ textAlign: 'center', padding: '3rem', gridColumn: '1 / -1' }}>
+              <h3>No Performance Data Yet</h3>
+              <p style={{ color: 'var(--text-secondary)' }}>Complete an exam to see your analytics summary here.</p>
+            </div>
+          </motion.div>
+        )
+      }
+
+      <motion.h1 className="exam-heading" variants={itemVariants}>Available Exams</motion.h1>
+      <motion.div className="exam-grid" variants={containerVariants}>
+        {allExams.length > 0 ? (
+          allExams.map((exam) => (
+            <motion.div
+              className="exam-card"
+              key={exam._id}
+              variants={itemVariants}
+            // whileHover={{ scale: 1.02 }}
+            // transition={{ type: "spring", stiffness: 200 }}
+            >
+              <div className="card-header">
+                <h2>{exam.examName}</h2>
+                <span className="badge duration">{exam.duration} min</span>
+              </div>
+
+              <div className="card-body">
+                <p><strong>Created by:</strong> {exam.createdBy}</p>
+                <p><strong>Groups:</strong> {exam.groups.map((grp) => grpNames[grp] || grp).join(", ")}</p>
+                <p className="date"><strong>Date:</strong> {new Date(exam.createtime).toLocaleDateString()}</p>
+              </div>
+
+              <div className="card-footer">
+                {!exam.submitted.includes(userData.userId) ? (
+                  <button className="start-btn" onClick={() => startExam(exam._id)}>
+                    {exam.endTime.includes(userData.username) ? "Resume" : "Start Now"}
+                  </button>
+                ) : (
+                  <div className="completed-actions">
+                    <span className="status-completed">Completed</span>
+                    <button className="view-analytics-btn" onClick={() => navigate(`/${exam._id}/analytics`)}>
+                      Analytics
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          ))
+        ) : (
+          <p className="no-data">No exams assigned to you yet.</p>
+        )}
+      </motion.div>
+
+      <motion.h1 className="exam-heading" variants={itemVariants}>Exams Organised</motion.h1>
+      <motion.div className="exam-grid" variants={containerVariants}>
+        {organised.length > 0 ? (
+          organised.map((exam) => (
+            <motion.div
+              className="exam-card"
+              key={exam._id}
+              variants={itemVariants}
+            // whileHover={{ scale: 1.02, translateY: -5 }}
+            >
+              <div className="card-header">
+                <h2>{exam.examName}</h2>
+                <span className="badge organiser">Host</span>
+              </div>
+              <div className="card-body">
+                <p><strong>Groups:</strong> {exam.groups.map((grp) => grpNames[grp] || grp).join(", ")}</p>
+                <p><strong>Duration:</strong> {exam.duration} min</p>
+              </div>
+              <div className="card-footer">
+                <button className="view-analytics-btn full-width" onClick={() => navigate(`/${exam._id}/analytics/leaderboard`)}>
+                  Leaderboard
+                </button>
+              </div>
+            </motion.div>
+          ))
+        ) : (
+          <p className="no-data">You haven't organised any exams yet.</p>
+        )}
+      </motion.div>
+    </motion.div >
   );
 };
 
