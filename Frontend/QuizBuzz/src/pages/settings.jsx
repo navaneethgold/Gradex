@@ -8,6 +8,8 @@ import HistoryIcon from '@mui/icons-material/History';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
 import SettingsIcon from '@mui/icons-material/Settings';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import LayersClearIcon from '@mui/icons-material/LayersClear';
+import { motion } from "framer-motion";
 
 const Settings = () => {
     const token = localStorage.getItem("token");
@@ -91,66 +93,78 @@ const Settings = () => {
         }
     };
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: { y: 0, opacity: 1 }
+    };
+
     return (
-        <div className="settings-page-container">
-            <div className="settings-header">
+        <motion.div
+            className="settings-page-container"
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+        >
+            <motion.div className="settings-header" variants={itemVariants}>
                 <h2><SettingsIcon fontSize="large" /> Settings</h2>
-            </div>
+            </motion.div>
 
             {show && <Flash message={flashMessage} type={type} show={show} setShow={setShow} />}
 
-            {/* General Settings Section - Placeholder for future */}
-            {/* 
-            <div>
-                <h3 className="settings-section-title">General</h3>
+            <motion.div className="settings-section" variants={itemVariants}>
+                <h3 className="settings-section-title">Data Management</h3>
                 <div className="settings-card">
-                    ...
-                </div>
-            </div> 
-            */}
-
-            {/* Danger Zone Section */}
-            <div>
-                <h3 className="settings-section-title" style={{ color: '#ef4444' }}>Danger Zone</h3>
-                <div className="settings-card danger-zone-card">
-
                     <div className="settings-option-item" onClick={deleteorganQuizHistory}>
                         <div className="option-content">
-                            <HistoryIcon sx={{ color: "#ef4444" }} />
-                            <div className="option-text danger-text">
-                                <h3>Delete Organized Quizzes</h3>
-                                <p>Permanently remove all quizzes you have created.</p>
+                            <HistoryIcon className="option-icon" />
+                            <div className="option-text">
+                                <h3>Clear Organized History</h3>
+                                <p>Delete all history of quizzes you have organized.</p>
                             </div>
                         </div>
-                        <button className="btn-danger-action">Delete History</button>
+                        <DeleteIcon color="action" />
                     </div>
 
                     <div className="settings-option-item" onClick={deleteCreatedGroups}>
                         <div className="option-content">
-                            <DeleteIcon sx={{ color: "#ef4444" }} />
-                            <div className="option-text danger-text">
+                            <LayersClearIcon className="option-icon" />
+                            <div className="option-text">
                                 <h3>Delete Created Groups</h3>
-                                <p>Permanently remove all groups you manage.</p>
+                                <p>Remove all groups you have created. This cannot be undone.</p>
                             </div>
                         </div>
-                        <button className="btn-danger-action">Delete Groups</button>
+                        <DeleteIcon color="action" />
                     </div>
+                </div>
+            </motion.div>
 
+            <motion.div className="settings-section danger-zone" variants={itemVariants}>
+                <h3 className="settings-section-title danger-title">
+                    <WarningAmberIcon fontSize="small" /> Danger Zone
+                </h3>
+                <div className="settings-card danger-zone-card">
                     <div className="settings-option-item" onClick={deleteAcc}>
                         <div className="option-content">
-                            <PersonOffIcon sx={{ color: "#ef4444" }} />
+                            <PersonOffIcon className="option-icon danger-icon" />
                             <div className="option-text danger-text">
                                 <h3>Delete Account</h3>
-                                <p>Permanently delete your account and all data.</p>
+                                <p>Permanently remove your account and all data.</p>
                             </div>
                         </div>
-                        <button className="btn-danger-action delete-account-btn">Delete Account</button>
+                        <button className="btn-danger-action">Delete Account</button>
                     </div>
-
                 </div>
-            </div>
-
-        </div>
+            </motion.div>
+        </motion.div>
     );
 };
+
 export default Settings;

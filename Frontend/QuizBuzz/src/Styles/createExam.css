@@ -1,12 +1,11 @@
-/* createExam.css */
+/* createExam.css - Premium Theme Styling */
 
 .create-exam-page {
     width: 100%;
     min-height: 100%;
     padding: 2rem;
-    background: #f8fafc;
-    font-family: 'Montserrat', sans-serif;
-    color: #1e293b;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
 }
 
 .create-exam-header {
@@ -16,12 +15,12 @@
 .create-exam-header h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
 }
 
 .create-exam-header p {
-    color: #64748b;
+    color: var(--text-secondary);
     font-size: 1rem;
 }
 
@@ -36,7 +35,6 @@
 /* Left Column: Group Selection */
 .group-selection-section {
     flex: 1;
-    /* Takes remaining space */
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -45,28 +43,31 @@
 .section-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--text-secondary);
     margin-bottom: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .search-bar {
     width: 100%;
     max-width: 400px;
     padding: 0.75rem 1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 0.95rem;
     outline: none;
-    background: white;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     transition: all 0.2s;
 }
 
 .search-bar:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--active-bg);
 }
 
 .groups-grid {
@@ -75,27 +76,38 @@
     gap: 1.5rem;
 }
 
+.no-groups {
+    text-align: center;
+    color: var(--text-secondary);
+    font-style: italic;
+    padding: 3rem;
+    grid-column: 1 / -1;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
 /* Group Card Styling */
 .group-card {
-    background: white;
-    border: 2px solid transparent;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 1.25rem;
     cursor: pointer;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
 }
 
 .group-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    /* Hover handled by Framer Motion, but CSS backup: */
+    border-color: var(--accent-color);
 }
 
 .group-card.selected {
-    border-color: #3b82f6;
-    background-color: #eff6ff;
+    border-color: var(--accent-color);
+    background-color: var(--active-bg);
 }
 
 .card-header {
@@ -108,7 +120,7 @@
 .card-header h3 {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-primary);
     margin: 0;
 }
 
@@ -116,23 +128,23 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 2px solid #cbd5e1;
+    border: 2px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s;
-    background: white;
+    background: transparent;
 }
 
 .group-card.selected .check-indicator {
-    background: #3b82f6;
-    border-color: #3b82f6;
+    background: var(--accent-color);
+    border-color: var(--accent-color);
     color: white;
 }
 
 .card-meta {
     font-size: 0.9rem;
-    color: #64748b;
+    color: var(--text-secondary);
     margin-top: 0.5rem;
     display: flex;
     flex-direction: column;
@@ -140,7 +152,7 @@
 }
 
 .card-meta span strong {
-    color: #475569;
+    color: var(--text-primary);
 }
 
 /* Right Column: Configuration Panel */
@@ -149,12 +161,18 @@
     flex-shrink: 0;
     position: sticky;
     top: 100px;
-    /* Offset from header */
-    background: white;
+    background: var(--bg-secondary);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #f1f5f9;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.config-title {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 700;
 }
 
 .config-group {
@@ -165,44 +183,39 @@
     display: block;
     font-size: 0.9rem;
     font-weight: 600;
-    color: #475569;
+    color: var(--text-secondary);
     margin-bottom: 0.5rem;
 }
 
-.config-input {
+.config-input,
+.config-select {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
+    background-color: var(--bg-primary);
+    /* Creating contrast within the card */
+    color: var(--text-primary);
     transition: all 0.2s;
     outline: none;
 }
 
-.config-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.config-select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #cbd5e1;
-    border-radius: 8px;
-    font-size: 1rem;
-    background-color: white;
-    cursor: pointer;
+.config-input:focus,
+.config-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--active-bg);
 }
 
 .selected-count {
     margin-top: 1rem;
     padding: 1rem;
-    background: #f8fafc;
+    background: var(--bg-primary);
     border-radius: 8px;
-    color: #334155;
+    color: var(--text-primary);
     font-weight: 500;
     text-align: center;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
 }
 
 .action-buttons {
@@ -233,7 +246,7 @@
 }
 
 .btn-proceed {
-    background: #3b82f6;
+    background: var(--accent-color);
     color: white;
     border: none;
     padding: 0.9rem;
@@ -244,22 +257,30 @@
 }
 
 .btn-proceed:hover {
-    background: #2563eb;
+    background: var(--accent-hover);
     transform: translateY(-2px);
 }
 
-.btn-disabled {
-    background: #cbd5e1;
-    cursor: not-allowed;
-    transform: none !important;
+/* Explicit Dark Mode Overrides */
+[data-theme='dark'] .group-card,
+[data-theme='dark'] .exam-config-section,
+[data-theme='dark'] .no-groups {
+    background-color: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .config-input,
+[data-theme='dark'] .config-select,
+[data-theme='dark'] .selected-count,
+[data-theme='dark'] .search-bar {
+    background-color: #0f172a !important;
+    /* Slate 900 for fields */
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 1024px) {
     .create-exam-layout {
-        flex-direction: column-reverse;
-        /* Config on top visually? No, usually content first on mobile. */
-        /* Let's put config on top for mobile so they see what they are creating? */
         flex-direction: column;
     }
 
@@ -268,6 +289,9 @@
         position: relative;
         top: 0;
         margin-bottom: 2rem;
+        order: -1;
+        /* Config on top for mobile accessibility? */
+        /* Changed to top so users see where to type exam name first */
     }
 }
 

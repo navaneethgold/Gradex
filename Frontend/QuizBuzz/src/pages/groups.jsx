@@ -6,14 +6,17 @@ import '../Styles/groups.css';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import SearchIcon from '@mui/icons-material/Search';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import { motion } from "framer-motion";
 
 const Groups = () => {
   const [group, setGroup] = useState("");
   const [allGroups, setAllGroups] = useState([]);
   const [flashMessage, setflashMessage] = useState("");
   const [type, setistype] = useState("");
-  const [roles, setRoles] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // New search state
+  const [roles, setRoles] = useState([]); // Array of { groupId, role }
+  const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
@@ -51,6 +54,8 @@ const Groups = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!group.trim()) return;
+
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/groups/new/${group}`, {}, {
         withCredentials: true,
@@ -83,11 +88,30 @@ const Groups = () => {
     grp.groupName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 1 }, // Changed opacity to 1 to guarantee visibility
+    visible: { y: 0, opacity: 1 }
+  };
+
   return (
-    <div className="groups-page-container">
+    <motion.div
+      className="groups-page-container"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {flashMessage && <Flash message={flashMessage} type={type} />}
 
-      <div className="groups-header-section">
+      {/* Header & Create Group Section */}
+      <motion.div className="groups-header-section" variants={itemVariants}>
         <div className="groups-titleing">
           <h1>Your Groups</h1>
           <p>Manage your classes and collaborative spaces.</p>
@@ -98,69 +122,79 @@ const Groups = () => {
             <input
               type="text"
               className="create-group-input"
-              onChange={handleChange}
+              placeholder="Enter new group name..."
               value={group}
-              placeholder="New Group Name..."
-              required
+              onChange={handleChange}
             />
-            {token ? (
-              <button type="submit" className="btn-create-group">
-                <AddCircleOutlineIcon style={{ fontSize: '1.2rem', verticalAlign: 'middle', marginRight: '4px' }} />
-                Create
-              </button>
-            ) : (
-              <button disabled className="btn-create-group" style={{ opacity: 0.6 }}>Login to Create</button>
-            )}
+            <button type="submit" className="create-group-btn" disabled={!group.trim()}>
+              <AddCircleOutlineIcon /> <span>Create Group</span>
+            </button>
           </form>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="groups-controls">
-        <input
-          type="text"
-          className="search-groups-input"
-          placeholder="Search your groups..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      {/* Search Bar */}
+      <motion.div className="groups-search-section" variants={itemVariants}>
+        <div className="search-bar-wrapper">
+          <SearchIcon className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search your groups..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </motion.div>
 
-      <div className="groups-grid">
+      {/* Groups Grid */}
+      <motion.div className="groups-grid" variants={containerVariants}>
         {filteredGroups.length > 0 ? (
-          filteredGroups.map((grp, index) => (
-            <div key={grp._id} className="group-card-item">
-              <div className="card-top">
-                <div className="group-name">{grp.groupName}</div>
-                <div className="group-creator">
-                  From: {grp.createdBy}
-                </div>
-              </div>
+          filteredGroups.map((grp) => {
+            // Determine Role
+            const roleObj = roles.find(r => r.groupId === grp._id);
+            const userRole = roleObj ? roleObj.role : 'Member';
+            const isAdmin = userRole === 'admin';
 
-              <div className="card-stats">
-                <div className="stat-item">
-                  <GroupsIcon style={{ fontSize: '1rem' }} />
-                  <span>{grp.members?.length || 0} Members</span>
+            return (
+              <motion.div
+                key={grp._id}
+                className="group-card-item"
+                onClick={() => handleViewGroup(grp._id)}
+                variants={itemVariants}
+                whileHover={{ scale: 1.02, y: -4 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                <div className="group-card-header">
+                  <h3>{grp.groupName}</h3>
+                  <span className={`role-badge ${isAdmin ? 'admin' : 'member'}`}>
+                    {isAdmin ? <AdminPanelSettingsIcon fontSize="small" /> : <PersonIcon fontSize="small" />}
+                    {isAdmin ? 'Admin' : 'Member'}
+                  </span>
                 </div>
-                <div className="stat-item">
-                  <PersonIcon style={{ fontSize: '1rem' }} />
-                  <span>{roles[index] || 'Member'}</span>
-                </div>
-              </div>
 
-              <div className="card-actions">
-                <button className="btn-view-group" onClick={() => handleViewGroup(grp._id)}>
-                  View Group
-                </button>
-              </div>
-            </div>
-          ))
+                <div className="group-card-body">
+                  <div className="group-stat">
+                    <GroupsIcon fontSize="small" />
+                    <span>{grp.members ? grp.members.length : 0} Members</span>
+                  </div>
+                  <div className="group-stat">
+                    <span>Created: {new Date(grp.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                <div className="group-card-footer">
+                  <span className="view-link">View Details &rarr;</span>
+                </div>
+              </motion.div>
+            );
+          })
         ) : (
-          <div className="no-groups">
-            {searchTerm ? `No groups match "${searchTerm}"` : "You haven't joined any groups yet. Create one above!"}
-          </div>
+          <motion.div className="no-groups-state" variants={itemVariants}>
+            <p>No groups found matching "{searchTerm}"</p>
+          </motion.div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

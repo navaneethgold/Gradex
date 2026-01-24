@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Flash from "./flash";
-import '../Styles/createExam.css'; // Updated CSS import
+import '../Styles/createExam.css';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CheckIcon from '@mui/icons-material/Check';
+import { motion } from "framer-motion";
 
 const CreateExam = () => {
     const [exam, setexam] = useState("");
@@ -17,7 +18,7 @@ const CreateExam = () => {
     const navigate = useNavigate();
     const [checked, setisChecked] = useState([]);
     const [linearity, setlinearity] = useState("Yes");
-    const [searchTerm, setSearchTerm] = useState(""); // New search state
+    const [searchTerm, setSearchTerm] = useState("");
 
     const fetchGroups = useCallback(async () => {
         try {
@@ -105,11 +106,10 @@ const CreateExam = () => {
                     }
                 });
                 if (res.data.message === "success") {
-                    const un = res.data.owner;
                     const newExam = res.data.newExam;
                     const examId = newExam._id;
-                    const unId = un._id;
-                    navigate(`/${unId}/${examId}/AI`);
+                    // Navigate to Gemini AI page passing the examId
+                    navigate(`/gemini-ai/${examId}`);
                 }
             } catch (error) {
                 console.error("AI Creation failed", error);
@@ -124,102 +124,128 @@ const CreateExam = () => {
         }
     };
 
-    // Filter groups based on search
     const filteredGroups = allGroups.filter(grp =>
         grp.groupName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    return (
-        <div className="create-exam-page">
-            <div className="create-exam-header">
-                <h1>Create New Exam</h1>
-                <p>Configure your exam details and select the target groups.</p>
-            </div>
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
 
-            {show && <Flash message={flashMessage} show={show} setShow={setShow} type={type} />}
+    const itemVariants = {
+        hidden: { y: 20, opacity: 1 }, // Changed opacity to 1 to guarantee visibility
+        visible: { y: 0, opacity: 1 }
+    };
+
+    return (
+        <motion.div
+            className="create-exam-page"
+            initial="hidden"
+            animate="visible"
+            variants={containerVariants}
+        >
+            {show && <Flash message={flashMessage} type={type} onClose={() => setShow(false)} />}
+
+            <motion.div className="create-exam-header" variants={itemVariants}>
+                <h1>Create New Assessment</h1>
+                <p>Configure your exam details and select target groups.</p>
+            </motion.div>
 
             <div className="create-exam-layout">
                 {/* Left Column: Group Selection */}
                 <div className="group-selection-section">
-                    <div className="section-title">
+                    <motion.div className="section-title" variants={itemVariants}>
                         <span>Select Groups</span>
                         <input
                             type="text"
-                            className="search-bar"
                             placeholder="Search groups..."
+                            className="search-bar"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                    </div>
+                    </motion.div>
 
-                    {allGroups.length > 0 ? (
-                        <div className="groups-grid">
-                            {filteredGroups.map((grp) => (
-                                <div
-                                    key={grp._id}
-                                    className={`group-card ${checked.includes(grp._id) ? 'selected' : ''}`}
-                                    onClick={() => handleChecking(grp._id)}
-                                >
-                                    <div className="card-header">
-                                        <h3>{grp.groupName}</h3>
-                                        <div className="check-indicator">
-                                            {checked.includes(grp._id) && <CheckIcon style={{ fontSize: 16 }} />}
+                    <motion.div className="groups-grid" variants={containerVariants}>
+                        {filteredGroups.length > 0 ? (
+                            filteredGroups.map((grp) => {
+                                const isSelected = checked.includes(grp._id);
+                                return (
+                                    <motion.div
+                                        key={grp._id}
+                                        className={`group-card ${isSelected ? 'selected' : ''}`}
+                                        onClick={() => handleChecking(grp._id)}
+                                        variants={itemVariants}
+                                        whileHover={{ scale: 1.02, y: -4 }}
+                                        whileTap={{ scale: 0.98 }}
+                                    >
+                                        <div className="card-header">
+                                            <h3>{grp.groupName}</h3>
+                                            <div className="check-indicator">
+                                                {isSelected && <CheckIcon fontSize="small" />}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="card-meta">
-                                        <span><strong>Created By:</strong> {grp.createdBy}</span>
-                                        <span><strong>Members:</strong> {grp.members?.length || 0}</span>
-                                        <span><strong>Role:</strong> Admin</span>
-                                    </div>
-                                </div>
-                            ))}
-                            {filteredGroups.length === 0 && <p>No groups found matching "{searchTerm}"</p>}
-                        </div>
-                    ) : (
-                        <p>You are not an admin of any group. Create a group first to conduct an exam.</p>
-                    )}
+                                        <div className="card-meta">
+                                            <span><strong>Members:</strong> {grp.members ? grp.members.length : 0}</span>
+                                            <span><strong>Created:</strong> {new Date(grp.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })
+                        ) : (
+                            <motion.p variants={itemVariants} className="no-groups">No groups found matching your search.</motion.p>
+                        )}
+                    </motion.div>
                 </div>
 
                 {/* Right Column: Configuration Panel */}
-                <div className="exam-config-section">
-                    <h2 className="section-title">Exam Configuration</h2>
+                <motion.div
+                    className="exam-config-section"
+                    initial={{ x: 50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+                >
+                    <h2 className="config-title">Configuration</h2>
 
                     <div className="config-group">
                         <label>Exam Name</label>
                         <input
                             type="text"
                             className="config-input"
+                            placeholder="e.g. Mid-Term Physics"
                             value={exam}
                             onChange={(e) => setexam(e.target.value)}
-                            placeholder="e.g., Midterm Physics"
                         />
                     </div>
 
                     <div className="config-group">
-                        <label>Duration (minutes)</label>
+                        <label>Duration (Minutes)</label>
                         <input
                             type="number"
                             className="config-input"
+                            placeholder="e.g. 60"
                             value={totalTime}
                             onChange={(e) => setTotalTime(e.target.value)}
-                            placeholder="e.g., 60"
                         />
                     </div>
 
                     <div className="config-group">
-                        <label>Linear Mode</label>
+                        <label>Linear Exam?</label>
                         <select
                             className="config-select"
                             value={linearity}
                             onChange={(e) => setlinearity(e.target.value)}
                         >
-                            <option value="Yes">Yes (Strict Navigation)</option>
-                            <option value="No">No (Free Navigation)</option>
+                            <option value="Yes">Yes (Cannot revisit questions)</option>
+                            <option value="No">No (Can revisit questions)</option>
                         </select>
                     </div>
 
                     <div className="selected-count">
-                        {checked.length} Group(s) Selected
+                        {checked.length} Group{checked.length !== 1 ? 's' : ''} Selected
                     </div>
 
                     <div className="action-buttons">
@@ -227,13 +253,13 @@ const CreateExam = () => {
                             <AutoAwesomeIcon /> Generate with AI
                         </button>
                         <button className="btn-proceed" onClick={handleProceeding}>
-                            Proceed Manually
+                            Create Manually
                         </button>
                     </div>
-                </div>
+                </motion.div>
             </div>
-        </div>
+        </motion.div>
     );
-}
+};
 
 export default CreateExam;

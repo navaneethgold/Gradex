@@ -1,53 +1,68 @@
-/* settings.css */
-
+/* settings.css variables */
 .settings-page-container {
     width: 100%;
     min-height: 100%;
     padding: 2rem;
-    background: #f8fafc;
-    font-family: 'Montserrat', sans-serif;
-    color: #1e293b;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
     display: flex;
     flex-direction: column;
     gap: 2rem;
 }
 
+.settings-header {
+    display: flex;
+    align-items: center;
+}
+
 .settings-header h2 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    margin: 0;
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .settings-section-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: #64748b;
-    margin-bottom: 1rem;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.settings-section-title.danger-title {
+    color: #ef4444;
 }
 
 /* Card Styles */
 .settings-card {
-    background: white;
-    border-radius: 12px;
+    background: var(--bg-secondary);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f1f5f9;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
 }
 
 .settings-option-item {
-    padding: 1.25rem 1.5rem;
+    padding: 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
     transition: all 0.2s;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .settings-option-item:last-child {
@@ -55,36 +70,44 @@
 }
 
 .settings-option-item:hover {
-    background: #f8fafc;
+    background: var(--active-bg);
 }
 
 .option-content {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.25rem;
+}
+
+.option-icon {
+    color: var(--accent-color);
 }
 
 .option-text h3 {
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .option-text p {
-    font-size: 0.85rem;
-    color: #94a3b8;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
     margin: 0.25rem 0 0 0;
 }
 
 /* Danger Zone */
 .danger-zone-card {
-    border: 1px solid #fecaca;
+    border: 1px solid rgba(239, 68, 68, 0.3);
     box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.05);
 }
 
 .danger-zone-card .settings-option-item:hover {
-    background: #fef2f2;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.danger-icon {
+    color: #ef4444;
 }
 
 .danger-text h3 {
@@ -96,13 +119,12 @@
 }
 
 .btn-danger-action {
-    padding: 0.5rem 1rem;
+    padding: 0.6rem 1.25rem;
     border: 1px solid #ef4444;
-    background: transparent;
     color: #ef4444;
-    border-radius: 6px;
+    background: transparent;
+    border-radius: 8px;
     font-weight: 600;
-    font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -112,24 +134,22 @@
     color: white;
 }
 
-.delete-account-btn {
-    background: #ef4444;
-    color: white;
+/* Explicit Dark Mode Overrides */
+[data-theme='dark'] .settings-card {
+    background-color: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
-.delete-account-btn:hover {
-    background: #dc2626;
-    border-color: #dc2626;
+[data-theme='dark'] .danger-zone-card {
+    border-color: rgba(239, 68, 68, 0.4);
+    background-color: rgba(69, 10, 10, 0.3) !important;
+    /* Dark Red tint */
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     .settings-page-container {
         padding: 1rem;
-    }
-
-    .settings-header h2 {
-        font-size: 1.5rem;
     }
 
     .settings-option-item {
@@ -137,6 +157,10 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
+    }
+
+    .option-content {
+        align-items: flex-start;
     }
 
     .btn-danger-action {

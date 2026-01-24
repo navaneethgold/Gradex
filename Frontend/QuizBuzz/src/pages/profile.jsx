@@ -11,6 +11,7 @@ import EqualizerIcon from '@mui/icons-material/Equalizer';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import GroupsIcon from '@mui/icons-material/Groups';
+import { motion } from "framer-motion";
 
 const Profile = () => {
   const token = localStorage.getItem("token");
@@ -71,10 +72,28 @@ const Profile = () => {
     navigate("/login");
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 1 }, // Ensure visibility
+    visible: { y: 0, opacity: 1 }
+  };
+
   return (
-    <div className="profile-page-container">
+    <motion.div
+      className="profile-page-container"
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+    >
       {/* User Header Section */}
-      <div className="profile-header-card">
+      <motion.div className="profile-header-card" variants={itemVariants}>
         <div className="user-info-wrapper">
           <div className="user-avatar-placeholder">
             <AccountCircleIcon style={{ fontSize: 'inherit' }} />
@@ -83,7 +102,6 @@ const Profile = () => {
             <h2>{userData.username || 'User'}</h2>
             <div className="user-meta">
               <span><EmailIcon fontSize="small" /> {userData.email}</span>
-              {/* Can add more details here later */}
             </div>
           </div>
         </div>
@@ -93,52 +111,79 @@ const Profile = () => {
             <LogoutIcon fontSize="small" /> Logout
           </button>
         )}
-      </div>
+      </motion.div>
 
       {/* Exams Grid Section */}
-      <div>
-        <h2 className="exams-section-title">Your Exams</h2>
-        <div className="exams-grid">
-          {allExams.length > 0 ? (
-            allExams.map((exam) => (
-              <div className="exam-card" key={exam._id}>
-                <div className="exam-header">
-                  <h3>{exam.examName}</h3>
-                </div>
+      <motion.div variants={itemVariants}>
+        <h2 className="exams-section-title">Your Assignments</h2>
 
-                <div className="exam-details">
-                  <p><AccountCircleIcon fontSize="small" style={{ color: '#94a3b8' }} /> Created by: {exam.createdBy}</p>
-                  <p><GroupsIcon fontSize="small" style={{ color: '#94a3b8' }} /> Groups: {exam.groups.map((grp) => grpNames[grp] || grp).join(", ")}</p>
-                  <p><AccessTimeIcon fontSize="small" style={{ color: '#94a3b8' }} /> Duration: {exam.duration} mins</p>
-                </div>
+        {allExams.length > 0 ? (
+          <motion.div
+            className="exams-grid"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {allExams.map((exam) => {
+              const isCompleted = exam.submitted?.includes(userData.userId);
+              return (
+                <motion.div
+                  key={exam._id}
+                  className="profile-exam-card"
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.02, y: -4 }}
+                  transition={{ type: "spring", stiffness: 200 }}
+                >
+                  <div className="pexam-header">
+                    <h3>{exam.examName}</h3>
+                    <span className={`status-badge ${isCompleted ? 'completed' : 'pending'}`}>
+                      {isCompleted ? <CheckCircleIcon fontSize="small" /> : <AccessTimeIcon fontSize="small" />}
+                      {isCompleted ? 'Completed' : 'Pending'}
+                    </span>
+                  </div>
 
-                <div className="exam-footer">
-                  {!exam.submitted.includes(userData.userId) ? (
-                    <button className="exam-btn btn-start" onClick={() => startExam(exam._id)}>
-                      <PlayArrowIcon /> {exam.endTime.includes(userData.username) ? "Resume Exam" : "Start Exam"}
-                    </button>
-                  ) : (
-                    <div className="completed-actions">
-                      <button className="exam-btn btn-completed">
-                        <CheckCircleIcon fontSize="small" /> Completed
-                      </button>
-                      <button className="exam-btn btn-analytics" onClick={() => navigate(`/${exam._id}/analytics`)}>
-                        <EqualizerIcon fontSize="small" /> Analytics
-                      </button>
+                  <div className="pexam-meta">
+                    <div className="meta-item">
+                      <GroupsIcon fontSize="small" />
+                      <span>{exam.groups?.map((grp) => grpNames[grp] || grp).join(", ") || "No Group"}</span>
                     </div>
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="no-exams">
-              <p>No exams have been assigned to you yet.</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+                    {isCompleted && (
+                      <div className="meta-item highlight">
+                        <EqualizerIcon fontSize="small" />
+                        <span>{exam.score} Marks</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pexam-actions">
+                    {isCompleted ? (
+                      <button
+                        className="btn-view-analytics"
+                        onClick={() => navigate(`/${exam._id}/analytics`)}
+                      >
+                        View Results
+                      </button>
+                    ) : (
+                      <button
+                        className="btn-start-exam"
+                        onClick={() => startExam(exam.examName)}
+                      >
+                        <PlayArrowIcon /> Start Exam
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        ) : (
+          <div className="no-exams-state">
+            <p>You haven't been assigned any exams yet.</p>
+          </div>
+        )}
+      </motion.div>
+    </motion.div>
   );
-}
+};
 
 export default Profile;

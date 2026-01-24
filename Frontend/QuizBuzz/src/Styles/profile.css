@@ -1,12 +1,11 @@
-/* profile.css */
+/* profile.css - Premium Theme Styling */
 
 .profile-page-container {
   width: 100%;
   min-height: 100%;
   padding: 2rem;
-  background: #f8fafc;
-  font-family: 'Montserrat', sans-serif;
-  color: #1e293b;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
@@ -14,17 +13,18 @@
 
 /* User Profile Header */
 .profile-header-card {
-  background: white;
+  background-color: var(--bg-secondary);
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 2rem;
-  background: linear-gradient(to right, #ffffff, #f8fafc);
+  padding: 1.5rem;
   position: relative;
   overflow: hidden;
+  flex-wrap: wrap;
+  gap: 1.5rem;
 }
 
 .profile-header-card::before {
@@ -32,39 +32,48 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 6px;
+  width: 4px;
   height: 100%;
-  background: #3b82f6;
+  background: var(--accent-color);
 }
 
 .user-info-wrapper {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
+  flex-wrap: wrap;
 }
 
 .user-avatar-placeholder {
-  width: 80px;
-  height: 80px;
-  background: #eff6ff;
+  width: 64px;
+  height: 64px;
+  background: var(--active-bg);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #3b82f6;
-  font-size: 2.5rem;
-  border: 2px solid #dbeafe;
+  color: var(--accent-color);
+  font-size: 2rem;
+  border: 2px solid var(--border-color);
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
 }
 
 .user-details h2 {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
 }
 
 .user-meta {
-  color: #64748b;
+  color: var(--text-secondary);
   font-size: 1rem;
   display: flex;
   flex-direction: column;
@@ -92,20 +101,17 @@
 }
 
 .btn-logout:hover {
-  background: #fee2e2;
+  background: rgba(239, 68, 68, 0.1);
   transform: translateY(-2px);
-  box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
 }
 
 /* Exams Section */
 .exams-section-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #334155;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
-  padding-left: 0.5rem;
-  border-left: 4px solid #3b82f6;
-  line-height: 1.2;
+
 }
 
 .exams-grid {
@@ -114,119 +120,161 @@
   gap: 1.5rem;
 }
 
-.exam-card {
-  background: white;
-  border-radius: 12px;
+.profile-exam-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f1f5f9;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+
+.profile-exam-card:hover {
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-md);
+}
+
+.pexam-header {
+  display: flex;
   justify-content: space-between;
-  height: 100%;
+  align-items: flex-start;
+  gap: 1rem;
 }
 
-.exam-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.exam-header h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 1rem;
+.pexam-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
-.exam-details {
+.status-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  text-transform: uppercase;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
-  color: #64748b;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
 }
 
-.exam-details p {
+.status-badge.completed {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-badge.pending {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.pexam-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.meta-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
-.exam-footer {
+.meta-item.highlight {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.pexam-actions {
   margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
 }
 
-/* Button Styles */
-.exam-btn {
+.btn-view-analytics,
+.btn-start-exam {
   width: 100%;
   padding: 0.8rem;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  border: none;
   transition: all 0.2s;
+  border: none;
+  font-size: 0.95rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
 }
 
-.btn-start {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+.btn-view-analytics {
+  background-color: var(--bg-primary);
+  /* Button matches theme */
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+.btn-view-analytics:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.btn-start-exam {
+  background-color: var(--accent-color);
   color: white;
 }
 
-.btn-start:hover {
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+.btn-start-exam:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
 }
 
-.completed-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.btn-completed {
-  background: #10b981;
-  color: white;
-  flex: 1;
-  cursor: default;
-}
-
-.btn-analytics {
-  background: #f59e0b;
-  color: white;
-  flex: 1;
-}
-
-.btn-analytics:hover {
-  background: #d97706;
-}
-
-.no-exams {
-  grid-column: 1 / -1;
+.no-exams-state {
   text-align: center;
   padding: 3rem;
-  color: #94a3b8;
-  background: white;
+  background-color: var(--bg-secondary);
   border-radius: 12px;
-  border: 2px dashed #e2e8f0;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Explicit Dark Mode Overrides */
+[data-theme='dark'] .profile-header-card,
+[data-theme='dark'] .profile-exam-card,
+[data-theme='dark'] .no-exams-state,
+[data-theme='dark'] .btn-view-analytics {
+  background-color: #1e293b !important;
+  /* Slate 800 */
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
+  .profile-page-container {
+    padding: 1rem;
+  }
+
   .profile-header-card {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.5rem;
-    padding: 1.5rem;
   }
 
   .user-info-wrapper {
-    flex-direction: row;
-    /* Keep avatar next to text */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 
   .btn-logout {
@@ -236,9 +284,5 @@
 
   .exams-grid {
     grid-template-columns: 1fr;
-  }
-
-  .profile-page-container {
-    padding: 1rem;
   }
 }
