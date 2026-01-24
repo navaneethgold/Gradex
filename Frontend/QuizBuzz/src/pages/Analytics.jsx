@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend
+} from "recharts";
+import { Home, Award, CheckCircle, XCircle, Slash, Activity } from 'lucide-react';
 import '../Styles/analytics.css';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import LeaderboardIcon from '@mui/icons-material/Leaderboard';
-import HomeIcon from '@mui/icons-material/Home';
 
 const Analytics = () => {
   const { exam } = useParams();
@@ -12,9 +15,12 @@ const Analytics = () => {
   const token = localStorage.getItem("token");
 
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line no-unused-vars
   const [examDetails, setExamDetails] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [questions, setQuestions] = useState([]);
   const [userData, setUserData] = useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [answers, setAnswers] = useState([]);
   const [stats, setStats] = useState({
     score: 0,
@@ -36,7 +42,7 @@ const Analytics = () => {
         });
 
         if (resQuestions.data.got) {
-          const fetchedQuestions = resQuestions.data.questions; // Likely sorted by questionNo
+          const fetchedQuestions = resQuestions.data.questions;
           const examInfo = resQuestions.data.Nowexam;
           const user = resQuestions.data.puser;
 
@@ -47,8 +53,6 @@ const Analytics = () => {
           });
 
           if (resAnswers.data.got) {
-            // answersAll is an array of answers. 
-            // Assuming index 0 matches Question 1, index 1 matches Question 2, etc.
             const userAnswers = resAnswers.data.answersq.answersAll;
 
             let correctCount = 0;
@@ -98,120 +102,197 @@ const Analytics = () => {
 
             await axios.post(`${import.meta.env.VITE_API_BASE_URL}/postAnalytics`, { newana: newAnalytic }, {
               withCredentials: true,
-              headers: { Authorization: `Bearer ${token}` }
             });
           }
         }
+        setLoading(false);
       } catch (err) {
-        console.error("Failed to fetch analytics", err);
-      } finally {
+        console.error("Error fetching analytics:", err);
         setLoading(false);
       }
     };
 
-    fetchAnalytics();
-  }, [exam, token]);
+    if (token) {
+      fetchAnalytics();
+    } else {
+      navigate('/login');
+    }
+  }, [exam, token, navigate]);
 
-  if (loading) {
-    return <div className="analytics-page-container" style={{ justifyContent: 'center', alignItems: 'center' }}><h2>Loading Analytics...</h2></div>;
-  }
+  if (loading) return (
+    <div className="analytics-loading">
+      <div className="loader"></div>
+      <p>Analyzing Performance...</p>
+    </div>
+  );
 
-  if (!examDetails || !userData) {
-    return <div className="analytics-page-container"><h2>Error loading analytics data.</h2></div>;
-  }
+  // Data for Charts
+  const pieData = [
+    { name: 'Correct', value: stats.correctCount, color: '#22c55e' },
+    { name: 'Wrong', value: stats.wrongCount, color: '#ef4444' },
+    { name: 'Skipped', value: stats.unattemptedCount, color: '#94a3b8' },
+  ];
 
-  const percentage = (stats.obtainedMarks / stats.totalMarks) * 100;
+  const barData = [
+    { name: 'Obtained', marks: stats.obtainedMarks },
+    { name: 'Total', marks: stats.totalMarks },
+  ];
 
   return (
-    <div className="analytics-page-container">
-      {/* Header */}
+    <motion.div
+      className="analytics-page"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header Section */}
       <div className="analytics-header">
-        <div className="header-info">
-          <h1><AssessmentIcon fontSize="large" sx={{ color: '#3b82f6' }} /> Exam Results</h1>
-          <p><strong>{examDetails.examName}</strong> • Candidate: {userData.username}</p>
+        <div>
+          <h1 className="page-title">
+            <Activity className="title-icon" /> Performance Analysis
+          </h1>
+          <p className="page-subtitle">Detailed insights for <strong>{exam}</strong></p>
         </div>
-        <div className="header-actions">
-          <button onClick={() => navigate(`/${examDetails._id}/analytics/leaderboard`)}>
-            <LeaderboardIcon /> Leaderboard
-          </button>
-          <button onClick={() => navigate('/home')} style={{ background: '#64748b' }}>
-            <HomeIcon /> Home
-          </button>
-        </div>
+        <button className="home-btn" onClick={() => navigate('/home')}>
+          <Home size={18} /> Back to Home
+        </button>
       </div>
 
-      <div className="analytics-dashboard">
-        {/* Score Card */}
-        <div className="score-card">
-          <div className="score-circle" style={{ background: `conic-gradient(#3b82f6 ${percentage}%, #e2e8f0 ${percentage}%)` }}>
-            <div className="score-value">{Math.round(percentage)}%</div>
+      {/* Summary Stats Grid */}
+      <div className="stats-grid">
+        <motion.div
+          className="stat-card highlight"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="stat-icon-bg"><Award size={32} /></div>
+          <div>
+            <h3>{stats.obtainedMarks} / {stats.totalMarks}</h3>
+            <p>Total Score</p>
           </div>
-          <div className="score-label">Score: {stats.obtainedMarks} / {stats.totalMarks}</div>
-          <p style={{ color: percentage >= 50 ? '#10b981' : '#ef4444', fontWeight: '600' }}>
-            {percentage >= 50 ? "Excellent Work!" : "Need Improvement"}
-          </p>
-        </div>
+        </motion.div>
 
-        {/* Stats Grid */}
-        <div className="stats-grid">
-          <div className="stat-card correct">
-            <h4>Correct</h4>
-            <p>{stats.correctCount}</p>
+        <motion.div
+          className="stat-card"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="stat-icon-bg green"><CheckCircle size={28} /></div>
+          <div>
+            <h3>{stats.correctCount}</h3>
+            <p>Correct</p>
           </div>
-          <div className="stat-card wrong">
-            <h4>Wrong</h4>
-            <p>{stats.wrongCount}</p>
+        </motion.div>
+
+        <motion.div
+          className="stat-card"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <div className="stat-icon-bg red"><XCircle size={28} /></div>
+          <div>
+            <h3>{stats.wrongCount}</h3>
+            <p>Incorrect</p>
           </div>
-          <div className="stat-card unattempted">
-            <h4>Unattempted</h4>
-            <p>{stats.unattemptedCount}</p>
+        </motion.div>
+
+        <motion.div
+          className="stat-card"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="stat-icon-bg gray"><Slash size={28} /></div>
+          <div>
+            <h3>{stats.unattemptedCount}</h3>
+            <p>Skipped</p>
           </div>
-          <div className="stat-card time">
-            <h4>Accuracy</h4>
-            <p>{stats.accuracy}%</p>
-          </div>
-        </div>
+        </motion.div>
       </div>
 
-      {/* Question Analysis */}
-      <div className="analysis-section">
-        <h2>Question Analysis</h2>
-        <div className="question-review-list">
-          {questions.map((q, idx) => {
-            const userAns = answers[idx];
-            const isCorrect = userAns && userAns.trim().toLowerCase() === q.qAnswer.trim().toLowerCase();
-            const isUnattempted = !userAns || userAns.trim() === "";
+      {/* Main Charts Section */}
+      <div className="charts-container">
 
-            let statusClass = "wrong";
-            let statusText = "Wrong";
-            if (isCorrect) { statusClass = "correct"; statusText = "Correct"; }
-            else if (isUnattempted) { statusClass = "unattempted"; statusText = "Not Attempted"; }
+        {/* Accuracy Pie Chart */}
+        <motion.div
+          className="chart-card"
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h2>Accuracy Distribution</h2>
+          <div className="chart-wrapper">
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'var(--bg-secondary)',
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="accuracy-center">
+            <h3>{stats.accuracy}%</h3>
+            <p>Accuracy</p>
+          </div>
+        </motion.div>
 
-            return (
-              <div key={q._id} className="review-item">
-                <div className="review-header">
-                  <span className="q-number">Question {q.questionNo}</span>
-                  <span className={`q-status ${statusClass}`}>{statusText}</span>
-                </div>
-                <div className="review-question">{q.question}</div>
-                <div className="review-answers">
-                  <div className="ans-block">
-                    <span className="ans-label">Your Answer</span>
-                    <span className={`ans-text ${isCorrect ? 'correct' : 'user-wrong'}`}>
-                      {isUnattempted ? "-" : userAns}
-                    </span>
-                  </div>
-                  <div className="ans-block">
-                    <span className="ans-label">Correct Answer</span>
-                    <span className="ans-text correct">{q.qAnswer}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {/* Marks Bar Chart */}
+        <motion.div
+          className="chart-card"
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          <h2>Score Overview</h2>
+          <div className="chart-wrapper">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={barData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
+                <XAxis dataKey="name" stroke="var(--text-secondary)" />
+                <YAxis stroke="var(--text-secondary)" />
+                <Tooltip
+                  cursor={{ fill: 'var(--hover-bg)' }}
+                  contentStyle={{
+                    backgroundColor: 'var(--bg-secondary)',
+                    borderColor: 'var(--border-color)',
+                    color: 'var(--text-primary)'
+                  }}
+                />
+                <Bar dataKey="marks" fill="var(--accent-color)" radius={[8, 8, 0, 0]} barSize={60} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </motion.div>
+
       </div>
-    </div>
+
+      {/* User Info Footer or Summary */}
+      <div className="analytics-footer">
+        <p>Candidate: <strong>{userData?.username || 'User'}</strong> | Exam ID: {examDetails?._id || 'N/A'}</p>
+      </div>
+
+    </motion.div>
   );
 };
 

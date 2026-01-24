@@ -1,5 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Default LIGHT Theme */
+  --bg-primary: #e2e8f0;
+  /* Slate 200 - Clearly GRAY background */
+  --bg-secondary: #FAF5FF;
+  /* Slate 100 - Lighter gray for sidebar */
+  --text-primary: #0f172a;
+  /* Slate 900 - Darker text for contrast */
+  --text-secondary: #475569;
+  /* Slate 600 */
+  --accent-color: #4f46e5;
+  /* Indigo 600 - Slightly darker for contrast */
+  --accent-hover: #4338ca;
+  /* Indigo 700 */
+  --border-color: #cbd5e1;
+  /* Slate 300 - Visible borders */
+  --hover-bg: #cbd5e1;
+  /* Slate 300 - Distinct hover */
+  --active-bg: rgba(79, 70, 229, 0.1);
+  --navbar-bg: #e8e3fc;
+  /* Slate 100 opacity */
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+
+  --sidebar-width: 260px;
+  --header-height: 70px;
+}
+
+[data-theme='dark'] {
+  /* DARK Theme Overrides */
+  --bg-primary: #0f172a;
+  /* Slate 900 */
+  --bg-secondary: #1e293b;
+  /* Slate 800 */
+  --text-primary: #f8fafc;
+  /* Slate 50 */
+  --text-secondary: #94a3b8;
+  /* Slate 400 */
+  --accent-color: #6366f1;
+  /* Indigo 500 */
+  --border-color: rgba(255, 255, 255, 0.08);
+  --hover-bg: rgba(255, 255, 255, 0.05);
+  --navbar-bg: rgba(15, 23, 42, 0.8);
+}
+
 * {
   user-select: none;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  padding: 0;
 }
 
 .layout {
@@ -9,28 +67,16 @@
 
 .main-content {
   flex: 1;
-  /* Sidebar width 240px */
-  margin-left: 240px;
-  /* Header height 80px */
-  padding-top: 80px;
+  margin-left: var(--sidebar-width);
+  padding-top: var(--header-height);
   min-height: 100vh;
-  background-color: #f8fafc;
-  /* Light gray background for content area */
+  background-color: var(--bg-primary);
   position: relative;
+  transition: margin-left 0.3s ease, background-color 0.3s ease;
 }
 
 @media (max-width: 768px) {
   .main-content {
-    margin-left: 70px;
-    /* Collapsed sidebar width */
-  }
-}
-
-@media (max-width: 480px) {
-  .main-content {
-    margin-left: 60px;
-    /* Small mobile sidebar width */
-    padding-top: 8vh;
-    /* Match mobile header height */
+    margin-left: 0;
   }
 }
