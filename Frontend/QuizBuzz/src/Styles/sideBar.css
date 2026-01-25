@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
-/* :root variables moved to App.css to handle global theming */
+/* Variables in App.css */
 
 /* Reset & Base */
 * {
@@ -9,7 +9,6 @@
 
 body {
   font-family: 'Outfit', sans-serif;
-  /* Consistent font with Login/Signup */
 }
 
 /* ----------------- 
@@ -20,29 +19,55 @@ body {
   top: 0;
   left: 0;
   height: 100vh;
-  width: var(--sidebar-width);
+  width: var(--sidebar-collapsed-width);
   background-color: var(--bg-secondary);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   z-index: 1000;
+  padding: 1.5rem 0.75rem;
+  /* Reduced padding for collapsed */
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  /* Hide overflow content when collapsed */
+  box-shadow: var(--shadow-sm);
+}
+
+.side-navigation.expanded {
+  width: var(--sidebar-expanded-width);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+  /* Add shadow when expanded to show layer */
   padding: 1.5rem 1rem;
-  transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Sidebar Header / Logo */
 .sidebar-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 2.5rem;
-  padding: 0 0.5rem;
-  cursor: pointer;
+  /* Justify handled by content presence (flex-1 vs centered) */
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding: 0 0.25rem;
+  white-space: nowrap;
+  height: 48px;
+  position: relative;
+}
+
+/* When collapsed, we want the header to strictly center the toggle button */
+.side-navigation:not(.expanded) .sidebar-header {
+  justify-content: center;
+  padding: 0;
+}
+
+.logo-container {
+  min-width: 36px;
+  display: flex;
+  justify-content: center;
 }
 
 .logo-img {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
 }
 
@@ -52,7 +77,75 @@ body {
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.5px;
+  opacity: 1;
+  transition: opacity 0.2s ease;
 }
+
+/* Unified Toggle Button (Inside Sidebar) */
+.sidebar-toggle-btn {
+  background: rgba(0, 0, 0, 0.03);
+  /* Subtle bg for visibility */
+  border: 1px solid transparent;
+  color: var(--text-primary);
+  /* High contrast */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  /* Increased from 32px */
+  height: 44px;
+  /* Increased from 32px */
+  border-radius: 8px;
+  /* Slightly larger radius */
+  transition: all 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--hover-bg);
+  color: var(--accent-color);
+  border-color: var(--border-color);
+}
+
+.sidebar-toggle-btn.centered {
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Ensure Logo takes space when visible */
+.header-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hide text when collapsed */
+.logo-text.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-10px);
+}
+
+/* Force toggle button to be hidden in collapsed mode if space is tight, 
+   BUT we need it to open.
+   Actually, if I hover it opens.
+   "not only hovering" -> they want to CLICK to open.
+   But if they can't see the button without hovering...
+   
+   Okay, let's make the Sidebar Header contain ONLY the Toggle Button when collapsed? 
+   No, branding is important.
+   
+   Let's use the `sidebar-toggle` from before but place it INSIDE, centered.
+   
+   Refined Logic:
+   Collapsed: Header shows Toggle Button (Menu). Logo Hidden.
+   Expanded: Header shows Logo + Toggle Button (Chevron).
+   
+   Let's adjust the CSS to hide logo when collapsed and show menu button.
+*/
 
 /* Navigation Menu */
 .nav-menu {
@@ -60,25 +153,26 @@ body {
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
-  /* Pushes footer down */
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  padding: 0.85rem 1rem;
+  padding: 0.85rem 0;
+  /* Vertical padding only, horizontal handled by center/gap */
   border-radius: 12px;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .nav-item:hover {
   background-color: var(--hover-bg);
   color: var(--text-primary);
-  transform: translateX(4px);
 }
 
 .nav-item.active {
@@ -87,17 +181,30 @@ body {
   font-weight: 600;
 }
 
-.nav-icon {
-  margin-right: 12px;
+/* Icon Wrapper ensures consistent centering in collapsed mode */
+.icon-wrapper {
+  min-width: 44px;
+  /* Matches collapsed width effectively minus padding */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 
 .nav-label {
   font-size: 1rem;
   font-weight: 500;
+  margin-left: 0.5rem;
+  transition: opacity 0.2s ease;
+  opacity: 1;
 }
 
-/* Active Indicator (Left Bar) */
-/* Optional: could rely just on color/bg, but adding specific marker */
+.nav-label.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Active Indicator */
 .active-indicator {
   position: absolute;
   left: 0;
@@ -107,7 +214,6 @@ body {
   width: 4px;
   border-radius: 0 4px 4px 0;
   background-color: var(--accent-color);
-  opacity: 1;
 }
 
 /* Sidebar Footer / Logout */
@@ -119,7 +225,6 @@ body {
 
 .nav-item.logout {
   color: #ef4444;
-  /* Red 500 */
 }
 
 .nav-item.logout:hover {
@@ -134,8 +239,10 @@ body {
 .top-navbar {
   position: fixed;
   top: 0;
-  left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
+  left: var(--sidebar-collapsed-width);
+  /* Always start from collapsed width */
+  width: calc(100% - var(--sidebar-collapsed-width));
+  /* Always fit remaining space */
   height: var(--header-height);
   background-color: var(--navbar-bg);
   backdrop-filter: blur(12px);
@@ -144,21 +251,63 @@ body {
   z-index: 999;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  /* Space between Left (Menu/Logo) and Right (User) */
   padding: 0 2rem;
   transition: all 0.3s ease;
 }
 
-.navbar-content {
-  width: 100%;
+.navbar-left-section {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  /* Right align content */
+  gap: 1rem;
 }
 
-.mobile-logo {
-  display: none;
-  /* Hidden on desktop */
+/* Navbar Logo (Visible when Sidebar Closed) */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+}
+
+.nav-logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.nav-logo-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Right Content (User) */
+.navbar-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Header Content Inside Sidebar (Hidden when Collapsed) */
+.header-content.hidden {
+  display: none !important;
 }
 
 /* User Actions */
@@ -172,10 +321,8 @@ body {
   background: transparent;
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  width: 52px;
-  /* Increased from 36px */
-  height: 52px;
-  /* Increased from 36px */
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -200,13 +347,13 @@ body {
 
 .welcome-text {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .username {
   color: var(--text-primary);
   font-weight: 600;
-  font-size: 1.15rem;
+  font-size: 1rem;
 }
 
 .user-avatar {
@@ -260,33 +407,85 @@ body {
   transform: translateY(-1px);
 }
 
-/* Responsive Adjustments */
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  display: none;
+  /* Hidden on desktop */
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Sidebar Overlay (Global) */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  /* Transparent on desktop */
+  z-index: 999;
+  /* Covers Navbar (999) but below Sidebar (1000) */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Mobile Responsiveness */
 @media (max-width: 768px) {
   .side-navigation {
     transform: translateX(-100%);
-    /* Hide sidebar */
+    /* Completely hidden by default on mobile */
+    width: var(--sidebar-expanded-width);
+    /* Full width when open on mobile */
   }
 
+  .side-navigation.expanded {
+    transform: translateX(0);
+    height: 100%;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    /* Show on mobile */
+  }
+
+  /* Navbar adjustments for mobile */
   .top-navbar {
     left: 0;
     width: 100%;
     padding: 0 1rem;
   }
 
-  .mobile-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-right: auto;
-    font-weight: 700;
-    color: var(--text-primary);
-  }
-
-  .mobile-logo img {
-    height: 28px;
-  }
+  /* Hide sidebar toggle when on mobile because we have the Close button inside? 
+     Actually, sidebar has Close button. Navbar has Open button.
+     We might want to hide the "Centered Menu Button" inside the sidebar on mobile 
+     because it's confusing if the sidebar is off-screen.
+     But the sidebar is HIDDEN.
+     When Open: It shows Logo + Chevron (Close). This is fine.
+  */
 
   .welcome-text {
     display: none;
+  }
+
+  .nav-logo-text {
+    display: none;
+  }
+
+  /* Darken overlay on mobile */
+  .sidebar-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
   }
 }

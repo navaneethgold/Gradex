@@ -10,7 +10,9 @@ import {
   LogOut,
   Menu,
   Sun,
-  Moon
+  Moon,
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 import "../Styles/sideBar.css";
 
@@ -20,6 +22,10 @@ export default function Sidebar() {
   const [isLogged, setIsLogged] = useState(false);
   const [userData, setUserData] = useState({});
   const [loading, setLoading] = useState(true);
+
+  // Sidebar State
+  const [isOpen, setIsOpen] = useState(false);
+  const isSidebarOpen = isOpen;
 
   // Theme State
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -71,7 +77,7 @@ export default function Sidebar() {
       }
     };
     checkAuth();
-  }, [location.pathname]); // Re-check on route change if needed
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -82,32 +88,41 @@ export default function Sidebar() {
   return (
     <>
       {/* Top Navigation Bar */}
-      <div className="top-navbar">
-        <div className="navbar-content">
-          {/* Logo available in Mobile view or just general branding */}
-          <div className="mobile-logo">
-            <img src="/icon.png" alt="QuizBuzz" />
-            <span>QuizBuzz</span>
-          </div>
+      <div className={`top-navbar ${isSidebarOpen ? 'shifted' : ''}`}>
+        <div className="navbar-left-section">
+          {/* Mobile Menu Button (Visible only on mobile) */}
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setIsOpen(true)}
+          >
+            <Menu size={24} />
+          </button>
 
+          {/* Logo in Navbar when Sidebar is Closed (Desktop) or always on Mobile if sidebar closed */}
+          {!isSidebarOpen && (
+            <div className="navbar-logo" onClick={() => navigate("/home")}>
+              <img src="/icon.png" alt="QuizBuzz" className="nav-logo-img" />
+              <span className="nav-logo-text">QuizBuzz</span>
+            </div>
+          )}
+        </div>
+
+        <div className="navbar-content">
           <div className="user-actions">
-            {/* Theme Toggle Button */}
-            {/* Theme Toggle Button */}
             <button
               className="theme-toggle-btn"
               onClick={toggleTheme}
               title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}
             >
-              {theme === 'light' ? <Moon size={24} /> : <Sun size={24} />}
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
 
             {!loading && (
               isLogged ? (
                 <div className="user-info">
-                  <span className="welcome-text">Welcome back,</span>
+                  <span className="welcome-text">Welcome,</span>
                   <span className="username">{userData.username || 'User'}</span>
                   <div className="user-avatar">
-                    {/* Placeholder avatar based on first letter */}
                     {(userData.username || 'U')[0].toUpperCase()}
                   </div>
                 </div>
@@ -123,10 +138,35 @@ export default function Sidebar() {
       </div>
 
       {/* Side Navigation Bar */}
-      <div className="side-navigation">
-        <div className="sidebar-header" onClick={() => navigate("/home")}>
-          <img src="/icon.png" alt="QuizBuzz Logo" className="logo-img" />
-          <h1 className="logo-text">QuizBuzz</h1>
+      <div
+        className={`side-navigation ${isSidebarOpen ? 'expanded' : 'collapsed'}`}
+      >
+        <div className="sidebar-header">
+          {/* Logo in Sidebar when Open */}
+          {isSidebarOpen && (
+            <div
+              className="header-content visible"
+              onClick={() => navigate("/home")}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+            >
+              <div className="logo-container">
+                <img src="/icon.png" alt="QuizBuzz Logo" className="logo-img" />
+              </div>
+              <h1 className="logo-text">QuizBuzz</h1>
+            </div>
+          )}
+
+          {/* Toggle Button (Menu when closed, Chevron when open) */}
+          <button
+            className={`sidebar-toggle-btn ${!isSidebarOpen ? 'centered' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(!isOpen);
+            }}
+            title={isOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+          >
+            {isSidebarOpen ? <ChevronLeft size={28} /> : <Menu size={28} />}
+          </button>
         </div>
 
         <nav className="nav-menu">
@@ -139,9 +179,14 @@ export default function Sidebar() {
                 key={item.path}
                 className={`nav-item ${isActive ? 'active' : ''}`}
                 onClick={() => navigate(item.path)}
+                title={!isSidebarOpen ? item.label : ''}
               >
-                <Icon size={20} className="nav-icon" />
-                <span className="nav-label">{item.label}</span>
+                <div className="icon-wrapper">
+                  <Icon size={22} className="nav-icon" />
+                </div>
+                <span className={`nav-label ${isSidebarOpen ? 'visible' : 'hidden'}`}>
+                  {item.label}
+                </span>
                 {isActive && <div className="active-indicator" />}
               </div>
             );
@@ -150,13 +195,25 @@ export default function Sidebar() {
 
         {isLogged && (
           <div className="sidebar-footer">
-            <div className="nav-item logout" onClick={handleLogout}>
-              <LogOut size={20} className="nav-icon" />
-              <span className="nav-label">Logout</span>
+            <div className="nav-item logout" onClick={handleLogout} title="Logout">
+              <div className="icon-wrapper">
+                <LogOut size={22} className="nav-icon" />
+              </div>
+              <span className={`nav-label ${isSidebarOpen ? 'visible' : 'hidden'}`}>
+                Logout
+              </span>
             </div>
           </div>
         )}
       </div>
+
+      {/* Overlay to close sidebar when clicking outside (Desktop & Mobile) */}
+      <div
+        className={`sidebar-overlay ${isSidebarOpen ? 'visible' : ''}`}
+        onClick={() => {
+          setIsOpen(false);
+        }}
+      />
     </>
   );
 }
