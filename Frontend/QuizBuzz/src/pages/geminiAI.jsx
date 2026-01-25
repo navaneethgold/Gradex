@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 import "../Styles/geminiAI.css";
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
@@ -10,6 +11,9 @@ import ArticleIcon from '@mui/icons-material/Article';
 import DescriptionIcon from '@mui/icons-material/Description';
 import Flash from "./flash";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+
 const GeminiAI = () => {
   const { unId, examId } = useParams();
   const navigate = useNavigate();
@@ -125,18 +129,39 @@ const GeminiAI = () => {
     }
   };
 
+  // Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  };
+
   return (
-    <div className="gemini-page-container">
-      <div className="gemini-header">
+    <motion.div
+      className="gemini-page-container"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.div className="gemini-header" variants={itemVariants}>
         <h2><AutoAwesomeIcon fontSize="large" sx={{ color: '#2563eb' }} /> AI Generator</h2>
         <p className="gemini-description">
           Define the parameters below and QuizBuzz AI will automatically generate a custom exam for you based on the syllabus provided.
         </p>
-      </div>
+      </motion.div>
 
       {show && <Flash message={flashMessage} type={type} show={show} setShow={setshow} />}
 
-      <div className="ai-config-grid">
+      <motion.div className="ai-config-grid" variants={itemVariants}>
         <div className="config-card">
           <label><EqualizerIcon fontSize="small" /> Difficulty Level</label>
           <select name="difficult" id="difficult" value={difficult} onChange={(e) => setdifficulty(e.target.value)}>
@@ -165,44 +190,76 @@ const GeminiAI = () => {
             <option value="MCQ,TrueFalse,FillBlank">Mixed</option>
           </select>
         </div>
+      </motion.div>
+
+      <div className="content-split-layout">
+        <motion.div className="prompt-section" variants={itemVariants}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+            <DescriptionIcon fontSize="small" /> Syllabus & Topics
+          </label>
+          <textarea
+            className="prompt-textarea"
+            placeholder="Paste the syllabus, chapter summaries, or specific topics you want to cover in this exam..."
+            value={portions}
+            onChange={(e) => setportions(e.target.value)}
+          />
+        </motion.div>
+
+        <motion.div className="file-section-container" variants={itemVariants}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+            <CloudUploadIcon fontSize="small" /> Upload Materials (PDF/Images)
+          </label>
+          <div className="file-upload-box">
+            <input type="file" multiple onChange={handleFileChange} id="file-upload" className="file-input-hidden" />
+            <label htmlFor="file-upload" className="file-drop-area">
+              <CloudUploadIcon fontSize="large" style={{ color: "var(--accent-primary)", opacity: 0.5 }} />
+              <span>Click to select files</span>
+            </label>
+          </div>
+
+          <AnimatePresence>
+            {files.length > 0 && (
+              <motion.div
+                className="selected-files-list"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <h4>Selected Files ({files.length})</h4>
+                <ul>
+                  {files.map((file, index) => (
+                    <motion.li
+                      key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 10 }}
+                    >
+                      <div className="file-info-chip">
+                        <InsertDriveFileIcon fontSize="small" />
+                        <span className="file-name">{file.name}</span>
+                      </div>
+                      <button className="btn-remove-file" onClick={() => handleRemoveFile(index)}>
+                        <DeleteOutlineIcon fontSize="small" />
+                      </button>
+                    </motion.li>
+                  ))}
+                </ul>
+                <button className="btn-upload-confirm" onClick={handleUpload}>
+                  Upload Selected Files
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
 
-      <div className="prompt-section">
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600', color: '#475569' }}>
-          <DescriptionIcon fontSize="small" /> Syllabus & Topics
-        </label>
-        <textarea
-          className="prompt-textarea"
-          placeholder="Paste the syllabus, chapter summaries, or specific topics you want to cover in this exam..."
-          value={portions}
-          onChange={(e) => setportions(e.target.value)}
-        />
-      </div>
-      <div className="file-section">
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600', color: '#475569' }}>
-          <CloudUploadIcon fontSize="large" /> Materials
-        </label>
-        <input type="file" multiple onChange={handleFileChange} />
-        <button className="btn-upload" onClick={handleUpload}>Upload</button>
-      </div>
-      {files.length > 0 && <div>
-        <h2>Files Selected</h2>
-        <ul>
-          {files.map((file, index) => {
-            return <li key={index}>{file.name}
-              <button onClick={() => handleRemoveFile(index)}>Remove</button>
-            </li>
-          })}
-        </ul>
-      </div>}
-
-      <div className="ai-actions">
+      <motion.div className="ai-actions" variants={itemVariants}>
         <button className="btn-generate-ai" onClick={handleAIgen} disabled={loading}>
           {loading ? <div className="loading-spinner"></div> : <AutoAwesomeIcon />}
-          {loading ? "Generating..." : "Generate Exam"}
+          {loading ? "Generating..." : "Generate Exam with AI"}
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 export default GeminiAI;

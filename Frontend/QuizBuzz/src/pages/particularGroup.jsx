@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 import "../Styles/particularGroup.css";
 import Flash from "./flash";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -93,90 +94,173 @@ export default function Pgroup() {
     navigate('/groups');
   }
 
-  if (loading) return <div className="group-details-container"><p className="loading-text">Loading Group Details...</p></div>;
-  if (!group) return <div className="group-details-container"><p className="error-text">Group not found or unauthorized.</p></div>;
+  // Animation Variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 }
+  };
+
+  if (loading) return (
+    <div className="group-details-container">
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="loading-text"
+      >
+        Loading Group Details...
+      </motion.p>
+    </div>
+  );
+
+  if (!group) return (
+    <div className="group-details-container">
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="error-text"
+      >
+        Group not found or unauthorized.
+      </motion.p>
+    </div>
+  );
 
   return (
-    <div className="group-details-container">
+    <motion.div
+      className="group-details-container"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {flash.message && (
         <Flash message={flash.message} type={flash.type} />
       )}
 
       {/* Header Section */}
-      <div className="details-header-card">
+      <motion.div className="details-header-card" variants={itemVariants}>
         <div className="group-info">
-          <h2>
-            <ArrowBackIcon className="back-btn-icon" onClick={goBack} fontSize="inherit" />
-            {group.groupName}
-          </h2>
+          <div className="group-title-row">
+            <motion.div
+              className="back-btn-wrapper"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={goBack}
+            >
+              <ArrowBackIcon className="back-btn-icon" fontSize="medium" />
+            </motion.div>
+            <h2>{group.groupName}</h2>
+          </div>
+
           <div className="group-meta">
-            <AdminPanelSettingsIcon fontSize="small" />
-            <span>Created by: <strong>{group.createdBy}</strong></span>
+            <div className="meta-badge">
+              <AdminPanelSettingsIcon fontSize="small" />
+              <span>Created by <strong>{group.createdBy}</strong></span>
+            </div>
+            <div className="meta-badge">
+              <GroupIcon fontSize="small" />
+              <span>{group.members?.length || 0} Members</span>
+            </div>
           </div>
         </div>
-        <button onClick={handleGroupChat} className="btn-group-chat">
+
+        <motion.button
+          onClick={handleGroupChat}
+          className="btn-group-chat"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           <ChatIcon /> Open Group Chat
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Dashboard Grid */}
       <div className="group-dashboard-grid">
 
         {/* Left Column: Members List */}
-        <div className="dashboard-card members-card">
+        <motion.div className="dashboard-card members-card" variants={itemVariants}>
           <div className="card-header-title">
-            <h3><GroupIcon /> Group Members ({group.members?.length || 0})</h3>
+            <h3><GroupIcon /> Members List</h3>
+            <span className="member-count-badge">{group.members?.length || 0}</span>
           </div>
           <div className="card-body members-list-container">
-            {group.members && group.members.length > 0 ? (
-              group.members.map((member, index) => (
-                <div key={index} className="member-item">
-                  <div className="member-info">
-                    <PersonIcon style={{ color: '#94a3b8' }} />
-                    <span>{member}</span>
-                  </div>
-                  <button
-                    className="btn-remove-member"
-                    title="Remove Member"
-                    onClick={() => handleRemoveMember(member)}
+            <AnimatePresence>
+              {group.members && group.members.length > 0 ? (
+                group.members.map((member, index) => (
+                  <motion.div
+                    key={member}
+                    className="member-item"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ delay: index * 0.05 }}
                   >
-                    <DeleteOutlineIcon />
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p className="no-members">No members in this group yet.</p>
-            )}
+                    <div className="member-info">
+                      <div className="member-avatar">
+                        <PersonIcon />
+                      </div>
+                      <span className="member-email">{member}</span>
+                    </div>
+                    <motion.button
+                      className="btn-remove-member"
+                      title="Remove Member"
+                      onClick={() => handleRemoveMember(member)}
+                      whileHover={{ scale: 1.1, color: "#ef4444" }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <DeleteOutlineIcon />
+                    </motion.button>
+                  </motion.div>
+                ))
+              ) : (
+                <p className="no-members">No members in this group yet.</p>
+              )}
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right Column: Admin Actions */}
-        <div className="dashboard-card admin-actions-card">
+        <motion.div className="dashboard-card admin-actions-card" variants={itemVariants}>
           <div className="card-header-title">
-            <h3><PersonAddIcon /> Add Member</h3>
+            <h3><PersonAddIcon /> Add New Member</h3>
           </div>
           <div className="card-body">
             <div className="add-member-form">
-              <input
-                type="email"
-                className="add-input"
-                placeholder="Enter member email"
-                value={newMember}
-                onChange={(e) => setNewMember(e.target.value)}
-              />
-              <button
+              <label className="form-label">Email Address</label>
+              <div className="input-with-icon">
+                <PersonIcon className="input-icon" />
+                <input
+                  type="email"
+                  className="add-input"
+                  placeholder="Enter user email..."
+                  value={newMember}
+                  onChange={(e) => setNewMember(e.target.value)}
+                />
+              </div>
+              <motion.button
                 className="btn-add-member"
                 onClick={handleAddMember}
                 disabled={!newMember.trim()}
+                whileHover={!newMember.trim() ? {} : { scale: 1.02 }}
+                whileTap={!newMember.trim() ? {} : { scale: 0.98 }}
               >
-                <PersonAddIcon fontSize="small" /> Add to Group
-              </button>
+                <PersonAddIcon fontSize="small" /> Add Member
+              </motion.button>
             </div>
-            {/* Future: Add more admin settings here */}
+
+            <div className="info-box">
+              <p>Adding a member will give them access to all quizzes and materials within this group.</p>
+            </div>
           </div>
-        </div>
+        </motion.div>
 
       </div>
-    </div>
+    </motion.div>
   );
 }

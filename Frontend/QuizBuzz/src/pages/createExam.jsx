@@ -106,10 +106,12 @@ const CreateExam = () => {
                     }
                 });
                 if (res.data.message === "success") {
+                    const un = res.data.owner;
                     const newExam = res.data.newExam;
+                    const unId = un._id;
                     const examId = newExam._id;
-                    // Navigate to Gemini AI page passing the examId
-                    navigate(`/gemini-ai/${examId}`);
+                    // Navigate to Gemini AI page using the correct route from App.jsx
+                    navigate(`/${unId}/${examId}/AI`);
                 }
             } catch (error) {
                 console.error("AI Creation failed", error);

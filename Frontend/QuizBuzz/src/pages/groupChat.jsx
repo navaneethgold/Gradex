@@ -2,9 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
+import { motion, AnimatePresence } from "framer-motion";
 import "../Styles/groupChat.css";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SendIcon from '@mui/icons-material/Send';
+import Avatar from '@mui/material/Avatar';
 
 const GroupChat = () => {
   const { id } = useParams();
@@ -15,6 +17,7 @@ const GroupChat = () => {
   const socketRef = useRef(null);
   const [newMsg, setnewMsg] = useState("");
   const messagesEndRef = useRef(null); // Ref for auto-scrolling
+  const [isTyping, setIsTyping] = useState(false); // Placeholder for future typing indicator
 
   // Fetch initial chat history
   useEffect(() => {
@@ -82,32 +85,19 @@ const GroupChat = () => {
     let username = userData.username;
     if (!socketRef.current || newMsg.trim() === '') return;
 
+    // Optimistic UI update could happen here, but we rely on socket echo currently
+    // to avoid duplication if the backend broadcasts to sender too.
     socketRef.current.emit("grp-message", { username, newMsg, id });
+
+    // Create temp object for API call (structure depends on backend implementation)
     const newtxt2 = {
       sender: username,
       message: newMsg,
       roomId: id,
       time: Date.now()
     };
-    // Optimistic update? socket listner handles it for everyone including sender usually, 
-    // but if the backend emits to sender too, we don't need to add it manually here.
-    // The original code relied on socket event for update, so we'll trust the socket event listener above.
-    // Wait, original code emitted AND manually added to UI? 
-    // Let's check original...
-    // Original: Emits -> Creates object -> setnewMsg("") -> Post to DB.
-    // And Listener: Adds to state.
-    // If the server broadcasts to everyone including sender, we might get double messages if we add here.
-    // Standard socket.io broadcast usually excludes sender.
-    // Let's stick to the pattern: Send -> Add to State locally -> API call to persist.
 
-    // Actually, let's play safe and follow the original logic of adding to state via local update?
-    // Original code: 
-    // socketRef.current.on("grp-message"...) -> adds to allMsgs
-    // handleSubmit -> emits... then setnewMsg("")... then axios.post...
-    // It DOES NOT add to allMsgs in handleSubmit in original code! It relies on the socket event coming back!
-    // Ah, wait. The original code did `socketRef.current.emit` and then `axios.post`. 
-    // The `socketRef.current.on` handles the incoming message. 
-    // If the server emits to `io.to(room)`, sender gets it back. So we rely on the listener.
+    // Optimistic Update removed as Socket handles broadcast
 
     setnewMsg("");
 
@@ -127,55 +117,130 @@ const GroupChat = () => {
     navigate(`/groups/${id}`);
   }
 
+  // Animation variants
+  const messageVariants = {
+    hidden: { opacity: 0, y: 10, scale: 0.98 },
+    visible: { opacity: 1, y: 0, scale: 1 },
+  };
+
   return (
     <div className="group-chat-container">
 
-      <div className="chat-header-bar">
-        <div className="header-title">
-          <h2>
-            <button className="back-btn-chat" onClick={goBack}>
-              <ArrowBackIcon />
-            </button>
-            Group Chat
-          </h2>
-        </div>
-      </div>
-
-      <div className="chat-messages-area">
-        {allMsgs && allMsgs.map((msg, ind) => (
-          <div
-            key={ind}
-            className={`message-bubble-wrapper ${msg.sender === userData.username ? "sent" : "received"}`}
+      {/* Header */}
+      <motion.div
+        className="chat-header-bar"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="header-left">
+          <motion.button
+            className="back-btn-chat"
+            onClick={goBack}
+            whileHover={{ scale: 1.1, backgroundColor: "var(--hover-bg)" }}
+            whileTap={{ scale: 0.9 }}
           >
-            <span className="sender-name">{msg.sender}</span>
-            <div className="message-content">
-              {msg.message}
-            </div>
-            <span className="message-timestamp">
-              {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
+            <ArrowBackIcon fontSize="medium" />
+          </motion.button>
+          <div className="header-info">
+            <h2>Group Chat</h2>
+            <span className="online-status">Active now</span>
           </div>
-        ))}
+        </div>
+        {/* Placeholder for group info or actions */}
+      </motion.div>
+
+      {/* Messages Area */}
+      <div className="chat-messages-area">
+        {allMsgs && allMsgs.map((msg, ind) => {
+          const isSender = msg.sender === userData.username;
+          const showAvatar = ind === 0 || allMsgs[ind - 1].sender !== msg.sender;
+
+          return (
+            <motion.div
+              key={ind}
+              className={`message-row ${isSender ? "row-sent" : "row-received"}`}
+              initial="hidden"
+              animate="visible"
+              variants={messageVariants}
+              transition={{ duration: 0.2 }}
+            >
+              {!isSender && (
+                <div className="avatar-spacer">
+                  {showAvatar ? (
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        bgcolor: stringToColor(msg.sender),
+                        fontSize: '0.9rem'
+                      }}
+                    >
+                      {msg.sender[0].toUpperCase()}
+                    </Avatar>
+                  ) : <div className="avatar-placeholder" />}
+                </div>
+              )}
+
+              <div className={`message-bubble-wrapper ${isSender ? "sent" : "received"}`}>
+                {!isSender && showAvatar && <span className="sender-name">{msg.sender}</span>}
+                <div className="message-content">
+                  {msg.message}
+                </div>
+                <span className="message-timestamp">
+                  {new Date(msg.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            </motion.div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="chat-input-wrapper">
+      {/* Input Area */}
+      <motion.div
+        className="chat-input-wrapper"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <form className="chat-form-styled" onSubmit={handleSubmit}>
           <input
             type="text"
             className="chat-input-field"
             value={newMsg}
             onChange={handleChange}
-            placeholder="Type your message..."
-            required
+            placeholder="Type a message..."
+            autoFocus
           />
-          <button type="submit" className="btn-send-msg" disabled={!newMsg.trim()}>
-            <SendIcon fontSize="small" style={{ marginLeft: '2px' }} />
-          </button>
+          <motion.button
+            type="submit"
+            className="btn-send-msg"
+            disabled={!newMsg.trim()}
+            whileHover={!newMsg.trim() ? {} : { scale: 1.1 }}
+            whileTap={!newMsg.trim() ? {} : { scale: 0.9 }}
+          >
+            <SendIcon fontSize="small" />
+          </motion.button>
         </form>
-      </div>
+      </motion.div>
 
     </div>
   );
 }
+
+// Utility to generate consistent color from string
+function stringToColor(string) {
+  let hash = 0;
+  for (let i = 0; i < string.length; i += 1) {
+    hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  let color = '#';
+  for (let i = 0; i < 3; i += 1) {
+    const value = (hash >> (i * 8)) & 0xff;
+    color += `00${value.toString(16)}`.slice(-2);
+  }
+  return color;
+}
+
 export default GroupChat;

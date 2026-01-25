@@ -2,28 +2,37 @@
 
 :root {
   /* Default LIGHT Theme */
-  --bg-primary: #e2e8f0;
-  /* Slate 200 - Clearly GRAY background */
-  --bg-secondary: #FAF5FF;
-  /* Slate 100 - Lighter gray for sidebar */
+  --bg-primary: #f8fafc;
+  /* Updated to Slate 50 for premium look */
+  --bg-secondary: #ffffff;
+  /* Pure white for cards */
+
   --text-primary: #0f172a;
-  /* Slate 900 - Darker text for contrast */
-  --text-secondary: #475569;
-  /* Slate 600 */
+  --text-secondary: #64748b;
+
+  /* Accent Colors */
   --accent-color: #4f46e5;
-  /* Indigo 600 - Slightly darker for contrast */
+  /* Existing Indigo */
+  --accent-primary: #3b82f6;
+  /* Blue for premium elements */
   --accent-hover: #4338ca;
-  /* Indigo 700 */
-  --border-color: #cbd5e1;
-  /* Slate 300 - Visible borders */
-  --hover-bg: #cbd5e1;
-  /* Slate 300 - Distinct hover */
-  --active-bg: rgba(79, 70, 229, 0.1);
-  --navbar-bg: #e8e3fc;
-  /* Slate 100 opacity */
+  /* Existing Indigo Hover */
+  --accent-primary-hover: #2563eb;
+  /* Blue Hover */
+
+  --border-color: #e2e8f0;
+  --hover-bg: #f1f5f9;
+
+  --active-bg: rgba(59, 130, 246, 0.1);
+  --navbar-bg: #ffffff;
+  /* Cleaner navbar */
+
+  /* Status Colors */
+  --danger: #ef4444;
+  --success: #10b981;
 
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 
   --sidebar-width: 260px;
   --header-height: 70px;
@@ -32,18 +41,23 @@
 [data-theme='dark'] {
   /* DARK Theme Overrides */
   --bg-primary: #0f172a;
-  /* Slate 900 */
   --bg-secondary: #1e293b;
-  /* Slate 800 */
+
   --text-primary: #f8fafc;
-  /* Slate 50 */
   --text-secondary: #94a3b8;
-  /* Slate 400 */
+
   --accent-color: #6366f1;
-  /* Indigo 500 */
-  --border-color: rgba(255, 255, 255, 0.08);
+  --accent-primary: #60a5fa;
+  /* Lighter blue for dark mode */
+  --accent-hover: #4f46e5;
+  --accent-primary-hover: #3b82f6;
+
+  --border-color: #334155;
   --hover-bg: rgba(255, 255, 255, 0.05);
-  --navbar-bg: rgba(15, 23, 42, 0.8);
+  --navbar-bg: rgba(30, 41, 59, 0.8);
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5);
 }
 
 * {
