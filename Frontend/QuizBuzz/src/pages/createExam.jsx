@@ -154,17 +154,17 @@ const CreateExam = () => {
 
             <motion.div className="create-exam-header" variants={itemVariants}>
                 <h1>Create New Assessment</h1>
-                <p>Configure your exam details and select target groups.</p>
+                <p>Configure your exam details and select target classes.</p>
             </motion.div>
 
             <div className="create-exam-layout">
                 {/* Left Column: Group Selection */}
                 <div className="group-selection-section">
                     <motion.div className="section-title" variants={itemVariants}>
-                        <span>Select Groups</span>
+                        <span>Select Classes</span>
                         <input
                             type="text"
-                            placeholder="Search groups..."
+                            placeholder="Search classes..."
                             className="search-bar"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -181,7 +181,7 @@ const CreateExam = () => {
                                         className={`group-card ${isSelected ? 'selected' : ''}`}
                                         onClick={() => handleChecking(grp._id)}
                                         variants={itemVariants}
-                                        whileHover={{ scale: 1.02, y: -4 }}
+                                        whileHover={{ y: -4 }}
                                         whileTap={{ scale: 0.98 }}
                                     >
                                         <div className="card-header">
@@ -191,14 +191,14 @@ const CreateExam = () => {
                                             </div>
                                         </div>
                                         <div className="card-meta">
-                                            <span><strong>Members:</strong> {grp.members ? grp.members.length : 0}</span>
+                                            <span><strong>Students:</strong> {grp.members ? grp.members.length : 0}</span>
                                             <span><strong>Created:</strong> {new Date(grp.createdAt).toLocaleDateString()}</span>
                                         </div>
                                     </motion.div>
                                 );
                             })
                         ) : (
-                            <motion.p variants={itemVariants} className="no-groups">No groups found matching your search.</motion.p>
+                            <motion.p variants={itemVariants} className="no-groups">No classes found matching your search.</motion.p>
                         )}
                     </motion.div>
                 </div>
@@ -247,7 +247,7 @@ const CreateExam = () => {
                     </div>
 
                     <div className="selected-count">
-                        {checked.length} Group{checked.length !== 1 ? 's' : ''} Selected
+                        {checked.length} Class{checked.length !== 1 ? 'es' : ''} Selected
                     </div>
 
                     <div className="action-buttons">

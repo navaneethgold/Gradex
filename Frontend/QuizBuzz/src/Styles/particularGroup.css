@@ -104,6 +104,13 @@
   gap: 0.5rem;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   font-family: inherit;
+  border: 1px solid transparent; /* Prepare for border transition */
+  transition: all 0.2s;
+}
+
+.btn-group-chat:hover {
+  border-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white border on hover */
+  /* No scale */
 }
 
 /* Dashboard Grid */
@@ -223,6 +230,12 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.btn-remove-member:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
 }
 
 .no-members {
@@ -292,6 +305,13 @@
   font-family: inherit;
   transition: all 0.2s;
   box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+  border: 1px solid transparent;
+}
+
+.btn-add-member:hover:not(:disabled) {
+  background-color: var(--success); /* Maintain bg */
+  border-color: rgba(255,255,255,0.6);
+  filter: brightness(1.1);
 }
 
 .btn-add-member:disabled {

@@ -220,6 +220,39 @@ app.put("/groups/:id/addmem", auth, async (req, res) => {
   }
 });
 
+app.put("/groups/:id/addMaterial", auth, async (req, res) => {
+  const { id } = req.params;
+  const { title, link, file } = req.body;
+
+  if (!title) {
+    return res.status(400).json({ message: "Title is required", added: false });
+  }
+
+  try {
+    const pgroup = await group.findById(id);
+    if (!pgroup) return res.status(404).json({ message: "Group not found", added: false });
+
+    // Optional: Only allow creator to add materials
+    if (pgroup.createdBy !== req.user.username) {
+      return res.status(403).json({ message: "Unauthorized", added: false });
+    }
+
+    pgroup.materials.push({
+      title,
+      link,
+      file,
+      uploadedAt: new Date()
+    });
+
+    await pgroup.save();
+    return res.status(200).json({ message: "Material added successfully", added: true });
+
+  } catch (err) {
+    console.error("Add material error:", err);
+    return res.status(500).json({ message: "Failed to add material", added: false });
+  }
+});
+
 app.put("/groups/:id/removemem", auth, async (req, res) => {
   const { id } = req.params;
   const { part } = req.body;

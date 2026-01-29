@@ -12,7 +12,8 @@ import {
   Sun,
   Moon,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  School // Import School icon
 } from 'lucide-react';
 import "../Styles/sideBar.css";
 
@@ -34,7 +35,7 @@ export default function Sidebar() {
   const navItems = [
     { label: "Home", path: "/home", icon: Home },
     { label: "New Exam", path: "/create-exam", icon: FilePlus },
-    { label: "Groups", path: "/groups", icon: Users },
+    { label: "Classes", path: "/groups", icon: School }, // Changed to Classes, School icon
     { label: "Profile", path: "/profile", icon: User },
     { label: "Settings", path: "/settings", icon: Settings },
   ];

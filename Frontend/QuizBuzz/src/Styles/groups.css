@@ -253,6 +253,10 @@
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+[data-theme='dark'] .group-card-item:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
 /* Responsive Media Queries */
 @media (max-width: 768px) {
   .groups-page-container {

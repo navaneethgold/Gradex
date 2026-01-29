@@ -113,7 +113,7 @@ const Groups = () => {
       {/* Header & Create Group Section */}
       <motion.div className="groups-header-section" variants={itemVariants}>
         <div className="groups-titleing">
-          <h1>Your Groups</h1>
+          <h1>Your Classes</h1>
           <p>Manage your classes and collaborative spaces.</p>
         </div>
 
@@ -122,12 +122,12 @@ const Groups = () => {
             <input
               type="text"
               className="create-group-input"
-              placeholder="Enter new group name..."
+              placeholder="Enter new class name..."
               value={group}
               onChange={handleChange}
             />
             <button type="submit" className="create-group-btn" disabled={!group.trim()}>
-              <AddCircleOutlineIcon /> <span>Create Group</span>
+              <AddCircleOutlineIcon /> <span>Create Class</span>
             </button>
           </form>
         </div>
@@ -139,7 +139,7 @@ const Groups = () => {
           <SearchIcon className="search-icon" />
           <input
             type="text"
-            placeholder="Search your groups..."
+            placeholder="Search your classes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -161,21 +161,19 @@ const Groups = () => {
                 className="group-card-item"
                 onClick={() => handleViewGroup(grp._id)}
                 variants={itemVariants}
-                whileHover={{ scale: 1.02, y: -4 }}
-                transition={{ type: "spring", stiffness: 200 }}
               >
                 <div className="group-card-header">
                   <h3>{grp.groupName}</h3>
                   <span className={`role-badge ${isAdmin ? 'admin' : 'member'}`}>
                     {isAdmin ? <AdminPanelSettingsIcon fontSize="small" /> : <PersonIcon fontSize="small" />}
-                    {isAdmin ? 'Admin' : 'Member'}
+                    {isAdmin ? 'Teacher' : 'Student'}
                   </span>
                 </div>
 
                 <div className="group-card-body">
                   <div className="group-stat">
                     <GroupsIcon fontSize="small" />
-                    <span>{grp.members ? grp.members.length : 0} Members</span>
+                    <span>{grp.members ? grp.members.length : 0} Students</span>
                   </div>
                   <div className="group-stat">
                     <span>Created: {new Date(grp.createdAt).toLocaleDateString()}</span>
@@ -190,7 +188,7 @@ const Groups = () => {
           })
         ) : (
           <motion.div className="no-groups-state" variants={itemVariants}>
-            <p>No groups found matching "{searchTerm}"</p>
+            <p>No classes found matching "{searchTerm}"</p>
           </motion.div>
         )}
       </motion.div>
