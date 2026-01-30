@@ -7,7 +7,7 @@ import { spawn } from "child_process";
 
 const processPdf = (objectKey) => {
   return new Promise((resolve, reject) => {
-    const python = spawn("python", ["./scripts/pdfOperations.py", objectKey]);
+    const python = spawn("python", ["./scripts/pdfOperations.py", objectKey, "--full-text"]);
 
     let output = "";
     let error = "";

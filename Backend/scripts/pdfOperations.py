@@ -125,6 +125,35 @@ def process_pdf(object_key):
         if os.path.exists(local_path):
             os.remove(local_path)
 
+def get_full_pdf_text(object_key):
+    """
+    Downloads PDF, extracts text from all pages (using get_page_text which handles OCR),
+    and returns the concatenated text.
+    """
+    bucket = os.getenv("S3_BUCKET_NAME")
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        local_path = tmp.name
+
+    doc = None
+    full_text = ""
+    try:
+        s3.download_file(bucket, object_key, local_path)
+        doc = fitz.open(local_path)
+        for page in doc:
+            text = get_page_text(page)
+            if text:
+                full_text += text + "\n\n"
+    except Exception as e:
+        print(f"Error processing PDF: {e}", file=sys.stderr)
+        return ""
+    finally:
+        if doc:
+            doc.close()
+        if os.path.exists(local_path):
+            os.remove(local_path)
+            
+    return full_text.strip()
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python pdfOperations.py <object_key>", file=sys.stderr)
@@ -133,4 +162,8 @@ if __name__ == "__main__":
     # Force UTF-8 encoding for stdout to handle special characters on Windows
     sys.stdout.reconfigure(encoding='utf-8')
     object_key = sys.argv[1]
-    print(process_pdf(object_key))
+    
+    if len(sys.argv) > 2 and sys.argv[2] == "--full-text":
+        print(get_full_pdf_text(object_key))
+    else:
+        print(process_pdf(object_key))

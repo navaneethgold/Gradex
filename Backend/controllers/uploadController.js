@@ -17,7 +17,7 @@ export const generatePresignedUrl = async (req, res) => {
         if (files && Array.isArray(files) && files.length > 0) {
             const fileUrls = await Promise.all(files.map(async (file) => {
                 const fileId = uuidv4();
-                const objectKey = `exams/${examId}/materials/${fileId}-${file.fileName}`;
+                const objectKey = `exams/${examId}/SecretMaterials/${fileId}-${file.fileName}`;
                 const command = new PutObjectCommand({
                     Bucket: process.env.S3_BUCKET_NAME,
                     Key: objectKey,
@@ -42,7 +42,7 @@ export const generatePresignedUrl = async (req, res) => {
         // Handle Single File (Backward Compatibility)
         if (files) {
             const fileId = uuidv4();
-            const objectKey = `exams/${examId}/materials/${fileId}-${files.fileName}`;
+            const objectKey = `exams/${examId}/SecretMaterials/${fileId}-${files.fileName}`;
             const command = new PutObjectCommand({
                 Bucket: process.env.S3_BUCKET_NAME,
                 Key: objectKey,
@@ -88,11 +88,11 @@ export const generatePresignedUrlClass = async (req, res) => {
                     ContentType: file.fileType,
                 });
                 const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
-                const material = new materials({
-                    classId,
-                    objectKey,
-                })
-                await material.save();
+                // const material = new materials({
+                //     classId,
+                //     objectKey,
+                // })
+                // await material.save();
                 return { fileName: file.fileName, uploadUrl, objectKey };
             }));
 
@@ -112,11 +112,11 @@ export const generatePresignedUrlClass = async (req, res) => {
                 Key: objectKey,
                 ContentType: files.fileType,
             });
-            const material = new materials({
-                classId,
-                objectKey,
-            })
-            await material.save();
+            // const material = new materials({
+            //     classId,
+            //     objectKey,
+            // })
+            // await material.save();
 
             const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
             return res.status(200).json({

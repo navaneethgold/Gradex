@@ -207,7 +207,7 @@ const GeminiAI = () => {
 
         <motion.div className="file-section-container" variants={itemVariants}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
-            <CloudUploadIcon fontSize="small" /> Upload Materials (PDF/Images)
+            <CloudUploadIcon fontSize="small" /> Upload Secret Materials (These materials won't be visible in Class Materials but considered for generating exam questions)
           </label>
           <div className="file-upload-box">
             <input type="file" multiple onChange={handleFileChange} id="file-upload" className="file-input-hidden" />
