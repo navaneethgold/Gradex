@@ -220,6 +220,9 @@ app.put("/groups/:id/addmem", auth, async (req, res) => {
   }
 });
 
+import { spawn } from 'child_process';
+import path from 'path';
+
 app.put("/groups/:id/addMaterial", auth, async (req, res) => {
   const { id } = req.params;
   const { title, link, file } = req.body;
@@ -245,7 +248,39 @@ app.put("/groups/:id/addMaterial", auth, async (req, res) => {
     });
 
     await pgroup.save();
-    return res.status(200).json({ message: "Material added successfully", added: true });
+
+    // Trigger Python Pipeline if it's a file (PDF)
+    // We assume 'file' is the S3 Key if it was uploaded
+    if (file && (file.endsWith('.pdf') || file.includes('materials'))) {
+      console.log("Triggering PDF Processing Pipeline for:", file);
+
+      // Define script paths
+      const pdfScript = path.join(process.cwd(), 'scripts', 'pdfOperations.py');
+      const vecScript = path.join(process.cwd(), 'scripts', 'vectorOperations.py');
+
+      // Spawn PDF Operations
+      const pdfProc = spawn('python', [pdfScript, file]);
+
+      // Spawn Vector Operations
+      const vecProc = spawn('python', [vecScript]);
+
+      // Pipe Output: PDF -> Vector
+      pdfProc.stdout.pipe(vecProc.stdin);
+
+      // Error Handling & Logging
+      pdfProc.stderr.on('data', (data) => console.error(`PDF Script Error: ${data}`));
+      vecProc.stderr.on('data', (data) => console.error(`Vector Script Error: ${data}`));
+
+      vecProc.on('close', (code) => {
+        if (code === 0) {
+          console.log("Vector Processing Complete Successfully.");
+        } else {
+          console.error(`Vector Processing failed with code ${code}`);
+        }
+      });
+    }
+
+    return res.status(200).json({ message: "Material added and processing started", added: true });
 
   } catch (err) {
     console.error("Add material error:", err);

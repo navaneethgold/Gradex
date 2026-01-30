@@ -40,6 +40,54 @@ def get_page_text(page):
             
     return text
 
+def chunk_text(text, chunk_size=1000, overlap=100):
+    """
+    Splits text into chunks of approximately chunk_size characters.
+    Tries to split on paragraphs (\n\n) first, then sentences.
+    Includes overlap between chunks to maintain context.
+    """
+    if not text:
+        return []
+        
+    chunks = []
+    start = 0
+    text_len = len(text)
+    
+    while start < text_len:
+        end = start + chunk_size
+        
+        # If we are not at the end of the text, try to find a natural break point
+        if end < text_len:
+            # Look for paragraph break
+            paragraph_break = text.rfind('\n\n', start, end)
+            if paragraph_break != -1 and paragraph_break > start + chunk_size * 0.5:
+                end = paragraph_break + 2 # Include the newline
+            else:
+                # Look for sentence break
+                sentence_break = text.rfind('. ', start, end)
+                if sentence_break != -1 and sentence_break > start + chunk_size * 0.5:
+                    end = sentence_break + 1 # Include the period
+                else:
+                    # Look for space
+                    space_break = text.rfind(' ', start, end)
+                    if space_break != -1 and space_break > start + chunk_size * 0.5:
+                        end = space_break
+        
+        chunk = text[start:end].strip()
+        if chunk:
+            chunks.append(chunk)
+        
+        # Move start pointer, accounting for overlap if we haven't reached the end
+        if end < text_len:
+            start = end - overlap
+            # Ensure we don't get stuck if overlap is too large or no progress is made
+            if start >= end: 
+                 start = end
+        else:
+            start = end
+            
+    return chunks
+
 def process_pdf(object_key):
     bucket = os.getenv("S3_BUCKET_NAME")
 
@@ -55,9 +103,13 @@ def process_pdf(object_key):
         for i, page in enumerate(doc):
             page_text = get_page_text(page)
             if page_text:
+                # Create chunks
+                chunks = chunk_text(page_text)
+                
                 pages_data.append({
                     "page": i + 1,
                     "text": page_text,
+                    "chunks": chunks,
                     "source": f"s3://{bucket}/{object_key}"
                 })
 

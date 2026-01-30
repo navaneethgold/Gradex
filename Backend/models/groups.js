@@ -8,7 +8,8 @@ const groupSchema = new mongoose.Schema({
         link: { type: String, required: false },
         file: { type: String, required: false },
         uploadedAt: { type: Date, default: Date.now }
-    }]
+    }],
+    createdAt: { type: Date, default: Date.now }
 })
 const group = mongoose.model("group", groupSchema);
 export default group;

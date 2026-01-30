@@ -118,16 +118,20 @@ export default function Pgroup() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const { uploadUrl, objectKey: key } = presignRes.data.fileUrls[0];
-        objectKey = key;
+        if (presignRes.data.success && presignRes.data.fileUrls && presignRes.data.fileUrls.length > 0) {
+          const { uploadUrl, objectKey: key } = presignRes.data.fileUrls[0];
+          objectKey = key;
 
-        // B. Upload to S3
-        await axios.put(uploadUrl, newMaterial.file, {
-          headers: { "Content-Type": newMaterial.file.type }
-        });
+          // B. Upload to S3
+          await axios.put(uploadUrl, newMaterial.file, {
+            headers: { "Content-Type": newMaterial.file.type }
+          });
+        } else {
+          throw new Error("Failed to get upload URL");
+        }
       }
 
-      // 3. Save to Group
+      // 3. Save to Backend
       const payload = {
         title: newMaterial.title,
         link: newMaterial.link,
@@ -144,6 +148,8 @@ export default function Pgroup() {
         setFlash({ message: "Material added successfully!", type: "success" });
         setNewMaterial({ title: "", link: "", file: null });
         fetchGroup(); // Refresh list
+      } else {
+        setFlash({ message: res.data.message || "Failed to add material", type: "error" });
       }
 
     } catch (err) {
