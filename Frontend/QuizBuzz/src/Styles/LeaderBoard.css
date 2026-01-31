@@ -1,74 +1,218 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+/* LeaderBoard.css - Redesign */
 
-.weAreLeaders {
-  position: fixed;
-  top: 11vh;
-  left: 215px;
-  right: 0;
-  bottom: 0;
+.leader-container {
+  width: 100%;
+  min-height: 100%;
   padding: 2rem;
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(to bottom right, #f8fbff, #eaf3ff);
-  overflow-y: auto;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-primary);
+  /* Background logic handled by Main Content in App.css */
 }
 
-.leaderboard-title {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+/* Header */
+.leader-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.5rem;
   text-align: center;
-  color: #003366;
 }
 
-.leaderboard-table {
+.leader-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(135deg, #FFD700, #FDB931);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  letter-spacing: 0.5px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.leader-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Card/Table Container */
+.leader-card {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme='dark'] .leader-card {
+  background-color: #1e293b;
+  /* Slate 800 */
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Table Styling */
+.leader-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
-.leaderboard-table th,
-.leaderboard-table td {
-  padding: 1rem;
+.leader-table thead {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme='dark'] .leader-table thead {
+  background-color: #0f172a;
+  /* Slate 900 */
+}
+
+.leader-table th {
+  padding: 1.25rem 1rem;
   text-align: center;
-  border-bottom: 1px solid #eee;
-}
-
-.leaderboard-table th {
-  background-color: #004a99;
-  color: white;
+  /* Center align headings */
   font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
 }
 
-.leaderboard-table tbody tr:nth-child(odd) {
-  background-color: #f9f9f9;
+.leader-table th:first-child {
+  padding-left: 2rem;
+  text-align: left;
+  /* Rank aligns left */
 }
 
-.leaderboard-table tbody tr:hover {
-  background-color: #e0f0ff;
-  transition: 0.3s ease;
+.leader-table td {
+  padding: 1.25rem 1rem;
+  color: var(--text-primary);
+  font-size: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+  text-align: center;
 }
 
-.rank-gold {
-  color: #d4af37;
-  font-weight: bold;
+.leader-table tr:last-child td {
+  border-bottom: none;
 }
 
-.rank-silver {
-  color: #c0c0c0;
-  font-weight: bold;
+.leader-table tbody tr:hover td {
+  background-color: var(--hover-bg);
 }
 
-.rank-bronze {
-  color: #cd7f32;
-  font-weight: bold;
+/* Rank Styling */
+.leader-rank-cell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-left: 1rem !important;
+  /* Adjustment for the flex container padding */
+  text-align: left !important;
 }
 
-@media (max-width:480px) {
-  .weAreLeaders{
-    top: 8vh;
-    left: 60px;
+.leader-rank-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.rank-1 {
+  background: linear-gradient(135deg, #FFD700, #FDB931);
+  border: 2px solid #fff;
+  font-size: 1.2rem;
+}
+
+.rank-2 {
+  background: linear-gradient(135deg, #E0E0E0, #BDBDBD);
+  border: 2px solid #fff;
+}
+
+.rank-3 {
+  background: linear-gradient(135deg, #CD7F32, #A0522D);
+  border: 2px solid #fff;
+}
+
+.rank-other {
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: none;
+  font-size: 0.9rem;
+}
+
+/* User Info */
+.leader-user-info {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Stats Badges */
+.leader-score-badge {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.leader-time {
+  color: var(--text-secondary);
+  font-family: monospace;
+  font-size: 0.95rem;
+}
+
+/* Empty State */
+.leader-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-secondary);
+}
+
+.leader-loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .leader-container {
+    padding: 1rem;
+  }
+
+  .leader-table th,
+  .leader-table td {
+    padding: 1rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Hide less important columns on mobile */
+  .leader-hide-mobile {
+    display: none;
+  }
+
+  .leader-title {
+    font-size: 1.5rem;
   }
 }

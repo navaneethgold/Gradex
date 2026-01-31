@@ -181,8 +181,8 @@ const CreateExam = () => {
                                         className={`group-card ${isSelected ? 'selected' : ''}`}
                                         onClick={() => handleChecking(grp._id)}
                                         variants={itemVariants}
-                                        whileHover={{ y: -4 }}
-                                        whileTap={{ scale: 0.98 }}
+                                    // whileHover={{ y: -4 }}
+                                    // whileTap={{ scale: 0.98 }}
                                     >
                                         <div className="card-header">
                                             <h3>{grp.groupName}</h3>

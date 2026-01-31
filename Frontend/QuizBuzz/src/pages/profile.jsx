@@ -131,8 +131,8 @@ const Profile = () => {
                   key={exam._id}
                   className="profile-exam-card"
                   variants={itemVariants}
-                  whileHover={{ scale: 1.02, y: -4 }}
-                  transition={{ type: "spring", stiffness: 200 }}
+                // whileHover={{ scale: 1.02, y: -4 }}
+                // transition={{ type: "spring", stiffness: 200 }}
                 >
                   <div className="pexam-header">
                     <h3>{exam.examName}</h3>

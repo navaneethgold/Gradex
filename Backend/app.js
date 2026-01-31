@@ -360,9 +360,13 @@ app.post("/create-new-exam/:exam/create-question", async (req, res) => {
   const { exam } = req.params;
   const { payload } = req.body;
   try {
-    const reg_qusetion = new question(payload);
-    await reg_qusetion.save();
-    return res.json({ message: "Successfully created new question", created: true });
+    const filter = { examName: payload.examName, questionNo: payload.questionNo };
+    const update = { ...payload };
+    const options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+    await question.findOneAndUpdate(filter, update, options);
+
+    return res.json({ message: "Successfully saved question", created: true });
   } catch (err) {
     console.log(err);
     return res.json({ message: "Failed to save", created: false });

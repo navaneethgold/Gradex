@@ -129,12 +129,19 @@
   flex-direction: column;
   gap: 1.25rem;
   box-shadow: var(--shadow-sm);
-  transition: all 0.2s;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 
 .profile-exam-card:hover {
+  transform: translateY(-5px) scale(1.02);
   border-color: var(--accent-color);
   box-shadow: var(--shadow-md);
+}
+
+[data-theme='dark'] .profile-exam-card:hover {
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .pexam-header {

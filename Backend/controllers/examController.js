@@ -36,3 +36,21 @@ export const getExamMaterials = async (req, res) => {
         return res.status(500).json({ message: "Failed to fetch materials", fetched: false });
     }
 };
+
+export const getExam = async (req, res) => {
+    const { examId } = req.params;
+    try {
+        const currentExam = await exam.findById(examId);
+        if (!currentExam) {
+            return res.status(404).json({ message: "Exam not found", fetched: false });
+        }
+        return res.status(200).json({
+            message: "Fetched exam",
+            fetched: true,
+            exam: currentExam
+        });
+    } catch (err) {
+        console.error("Error fetching exam:", err);
+        return res.status(500).json({ message: "Failed to fetch exam", fetched: false });
+    }
+};
