@@ -18,9 +18,11 @@ METADATA_FILE = "metadata_store.json"
 # Using a small, efficient model
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
+import argparse
+
 def download_from_s3(local_dir):
     """Downloads index and metadata from S3 if they exist."""
-    print("Checking for existing vector store in S3...")
+    print("Checking for existing vector store in S3...", file=sys.stderr)
     index_path = os.path.join(local_dir, INDEX_FILE)
     metadata_path = os.path.join(local_dir, METADATA_FILE)
     
@@ -30,24 +32,24 @@ def download_from_s3(local_dir):
     
     try:
         s3.download_file(BUCKET_NAME, S3_PREFIX + INDEX_FILE, index_path)
-        print("Downloaded index.")
+        print("Downloaded index.", file=sys.stderr)
         index = faiss.read_index(index_path)
     except Exception as e:
-        print(f"Index not found or error downloading: {e}. Creating new index.")
+        print(f"Index not found or error downloading: {e}. Creating new index.", file=sys.stderr)
 
     try:
         s3.download_file(BUCKET_NAME, S3_PREFIX + METADATA_FILE, metadata_path)
-        print("Downloaded metadata.")
+        print("Downloaded metadata.", file=sys.stderr)
         with open(metadata_path, 'r', encoding='utf-8') as f:
             metadata = json.load(f)
     except Exception as e:
-        print(f"Metadata not found or error downloading: {e}. Creating new metadata.")
+        print(f"Metadata not found or error downloading: {e}. Creating new metadata.", file=sys.stderr)
 
     return index, metadata
 
 def upload_to_s3(local_dir, index, metadata):
     """Save index and metadata to disk, then upload to S3."""
-    print("Uploading updated vector store to S3...")
+    print("Uploading updated vector store to S3...", file=sys.stderr)
     index_path = os.path.join(local_dir, INDEX_FILE)
     metadata_path = os.path.join(local_dir, METADATA_FILE)
 
@@ -60,7 +62,7 @@ def upload_to_s3(local_dir, index, metadata):
     try:
         s3.upload_file(index_path, BUCKET_NAME, S3_PREFIX + INDEX_FILE)
         s3.upload_file(metadata_path, BUCKET_NAME, S3_PREFIX + METADATA_FILE)
-        print("Upload successful.")
+        print("Upload successful.", file=sys.stderr)
     except Exception as e:
         print(f"Error uploading to S3: {e}", file=sys.stderr)
         raise e
@@ -78,7 +80,7 @@ def process_and_store(pdf_json_output):
     pdf_json_output: List of page objects with 'chunks'
     """
     if not pdf_json_output:
-        print("No data to process.")
+        print("No data to process.", file=sys.stderr)
         return
 
     # 1. Prepare Data
@@ -100,10 +102,10 @@ def process_and_store(pdf_json_output):
             })
 
     if not new_chunks:
-        print("No chunks found in input.")
+        print("No chunks found in input.", file=sys.stderr)
         return
 
-    print(f"Processing {len(new_chunks)} new chunks...")
+    print(f"Processing {len(new_chunks)} new chunks...", file=sys.stderr)
 
     with tempfile.TemporaryDirectory() as temp_dir:
         # 2. Download Embedding Store
@@ -119,15 +121,68 @@ def process_and_store(pdf_json_output):
         for i, entry in enumerate(new_metadata_entries):
             metadata[str(start_id + i)] = entry
             
-        print(f"Added {len(new_chunks)} vectors. Total count: {index.ntotal}")
+        print(f"Added {len(new_chunks)} vectors. Total count: {index.ntotal}", file=sys.stderr)
 
         # 5. Upload Updating Store
         upload_to_s3(temp_dir, index, metadata)
 
+def search_vector_store(query, allowed_sources=None, k=10):
+    """
+    Searches the vector store for the query.
+    Filters results to only include chunks from allowed_sources.
+    """
+    print(f"Searching for: '{query}' in sources: {allowed_sources}...", file=sys.stderr)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # 1. Download
+        index, metadata = download_from_s3(temp_dir)
+        
+        if index.ntotal == 0:
+            print("Index is empty.", file=sys.stderr)
+            return []
+
+        # 2. Embed Query
+        query_vector = model.encode([query]).astype("float32")
+        
+        # 3. Search (Fetch more to allow for filtering)
+        # If we need 10 results but filter 80% out, we need a larger pool.
+        fetch_k = 50 
+        distances, indices = index.search(query_vector, fetch_k)
+        
+        results = []
+        source_set = set(allowed_sources) if allowed_sources else None
+        
+        # 4. Filter and Format
+        for i, idx in enumerate(indices[0]):
+            if idx == -1: continue
+            
+            meta = metadata.get(str(idx))
+            if not meta: continue
+            
+            # Filter by source
+            if source_set and meta.get('source') not in source_set:
+                continue
+                
+            results.append(meta.get('text'))
+            
+            if len(results) >= k:
+                break
+                
+        return results
+
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python vectorOperations.py <json_data_string> OR pipe data", file=sys.stderr)
-        # Check if piping
+    parser = argparse.ArgumentParser(description="Vector Store Operations")
+    parser.add_argument("--search", type=str, help="Query string for similarity search")
+    parser.add_argument("--sources", type=str, help="Comma-separated list of allowed S3 object keys")
+    
+    args, unknown = parser.parse_known_args()
+    
+    if args.search:
+        # Search Mode
+        sources = args.sources.split(",") if args.sources else None
+        results = search_vector_store(args.search, sources)
+        print(json.dumps(results)) # Output JSON list of strings for Node.js to parse
+    else:
+        # Ingestion Mode (Default / Pipe)
         if not sys.stdin.isatty():
              data = sys.stdin.read()
              try:
@@ -136,13 +191,12 @@ if __name__ == "__main__":
              except json.JSONDecodeError as e:
                  print(f"Invalid JSON input: {e}", file=sys.stderr)
                  sys.exit(1)
+        elif len(sys.argv) > 1:
+             # Try to parse first arg as JSON (Legacy support)
+            try:
+                json_data = json.loads(sys.argv[1])
+                process_and_store(json_data)
+            except json.JSONDecodeError:
+                pass # Argument likely processed by argparse if valid
         else:
-            sys.exit(1)
-    else:
-        # Argument mode
-        try:
-            json_data = json.loads(sys.argv[1])
-            process_and_store(json_data)
-        except json.JSONDecodeError:
-            print("Invalid JSON argument.", file=sys.stderr)
-            sys.exit(1)
+             parser.print_help()

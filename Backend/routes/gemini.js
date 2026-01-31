@@ -103,18 +103,63 @@ OUTPUT CONSTRAINTS (STRICT):
   }
 }
 
+const getRelevantContext = (query, sources) => {
+  return new Promise((resolve, reject) => {
+    // Sources map to 'selectedMaterialIds' which are S3 Object Keys
+    const sourceStr = sources.join(",");
+
+    // Spawn python script in search mode
+    // Note: 'portions' (syllabus/query) is passed as the search query
+    const python = spawn("python", ["./scripts/vectorOperations.py", "--search", query, "--sources", sourceStr]);
+
+    let output = "";
+    let error = "";
+
+    python.stdout.on("data", (data) => {
+      output += data.toString();
+    });
+
+    python.stderr.on("data", (data) => {
+      error += data.toString();
+    });
+
+    python.on("close", (code) => {
+      if (code !== 0) {
+        console.error("Vector Search Error:", error);
+        // Don't reject, just resolve empty so flow continues
+        resolve("");
+      } else {
+        try {
+          // Output is a JSON list of strings (chunks)
+          console.log("Vector Search Output:", output);
+          const chunks = JSON.parse(output);
+          resolve(chunks.join("\n\n")); // Join chunks with newlines
+        } catch (err) {
+          console.error("Failed to parse vector search output:", output);
+          // If parse fails (e.g. empty), return empty string or fallback
+          resolve("");
+        }
+      }
+    });
+  });
+};
+
 router.post("/generate-AI-questions", async (req, res) => {
-  const { examId, difficult, maxMarks, noQuestions, typeQuestions, portions } = req.body;
+  const { examId, difficult, maxMarks, noQuestions, typeQuestions, portions, selectedMaterialIds } = req.body;
 
   if (!difficult || !maxMarks || !noQuestions || !typeQuestions || !portions) {
+    console.log("Missing required fields");
     return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
     const exam = await materials.find({ examId });
     if (!exam) {
+      console.log("Exam not found");
       return res.status(404).json({ error: "Exam not found" });
     }
+
+    // 1. Fetch Full Text (Legacy)
     let text = "";
     for (const eachexam of exam) {
       console.log(eachexam);
@@ -122,13 +167,26 @@ router.post("/generate-AI-questions", async (req, res) => {
       try {
         const extracted = await processPdf(object);
         text += extracted + "\n\n";
-        console.log("Extracted:", extracted);
+        console.log("Extracted:", extracted.length);
       } catch (err) {
         console.error(`Failed to process ${object}:`, err);
       }
     }
-    const AIquestions = await generateExamQuestions(text, difficult, maxMarks, noQuestions, typeQuestions, portions);
-    console.log("AIquestions", AIquestions);
+
+    // 2. Fetch Relevant Context (RAG)
+    let contextText = "";
+    if (selectedMaterialIds && selectedMaterialIds.length > 0) {
+      console.log(`Generating context for query: "${portions}"`);
+      contextText = await getRelevantContext(portions, selectedMaterialIds);
+      console.log("Retrieved RAG Context Length:", contextText.length);
+    }
+
+    // 3. Combine Contexts
+    const finalText = text + "\n\n" + "### RELEVANT CONTEXT FROM VECTORS ###\n" + contextText;
+
+    const AIquestions = await generateExamQuestions(finalText, difficult, maxMarks, noQuestions, typeQuestions, portions);
+    console.log("AIquestions generated");
+
     let parsedQuestions;
     try {
       parsedQuestions = JSON.parse(AIquestions);

@@ -18,6 +18,7 @@ import answer from './models/answers.js';
 import analytic from './models/analytics.js';
 import AIQuestionRoute from "./routes/gemini.js"
 import fileRoute from "./routes/fileRoutes/file.js";
+import examRoutes from "./routes/examRoutes.js";
 dotenv.config();
 const app = express();
 const server = createServer(app);
@@ -66,6 +67,7 @@ async function main() {
 }
 app.use("/", AIQuestionRoute);
 app.use("/api/upload", fileRoute);
+app.use("/api/exams", examRoutes);
 
 app.post("/signUp", async (req, res) => {
   try {
@@ -239,7 +241,6 @@ app.put("/groups/:id/addMaterial", auth, async (req, res) => {
     if (pgroup.createdBy !== req.user.username) {
       return res.status(403).json({ message: "Unauthorized", added: false });
     }
-
     pgroup.materials.push({
       title,
       link,
@@ -373,7 +374,12 @@ app.post("/create-new-exam/:exam/create-question", async (req, res) => {
 app.get("/home/getExams/:username", async (req, res) => {
   const { username } = req.params;
   try {
-    const hisGroups = await group.find({ members: username, createdBy: { $ne: username } });
+    const hisGroups = await group.find({
+      $or: [
+        { members: username },
+        { createdBy: username }
+      ]
+    });
     const groupIds = [];
     for (const grp of hisGroups) {
       groupIds.push(grp._id);

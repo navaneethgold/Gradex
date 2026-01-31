@@ -13,6 +13,7 @@ import Flash from "./flash";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 
 const GeminiAI = () => {
   const { unId, examId } = useParams();
@@ -28,6 +29,42 @@ const GeminiAI = () => {
   const [show, setshow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState([]);
+  const [classMaterials, setClassMaterials] = useState([]);
+  const [selectedMaterialIds, setSelectedMaterialIds] = useState([]);
+
+  useEffect(() => {
+    const fetchMaterials = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${examId}/materials`, {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data.fetched) {
+          setClassMaterials(res.data.materials);
+        }
+      } catch (err) {
+        console.error("Failed to fetch class materials:", err);
+      }
+    };
+    if (examId) fetchMaterials();
+  }, [examId, token]);
+
+  const handleMaterialToggle = (material) => {
+    let matKey = material.objectKey || material.file; // Fallback if objectKey is missing
+    console.log("matKey", matKey);
+    matKey = `s3://${import.meta.env.VITE_BUCKET_NAME}/${matKey}`
+    console.log("matKey", matKey);
+    if (selectedMaterialIds.includes(matKey)) {
+      setSelectedMaterialIds(prev => prev.filter(id => id !== matKey));
+    } else {
+      setSelectedMaterialIds(prev => [...prev, matKey]);
+    }
+  };
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token])
 
   const handleFileChange = (e) => {
     if (e.target.files) {
@@ -95,11 +132,13 @@ const GeminiAI = () => {
         maxMarks,
         noQuestions,
         typeQuestions,
-        portions
+        portions,
+        selectedMaterialIds
       }, {
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}` }
       });
+      console.log("res", res);
       const questions = res.data.allAiQuestions;
       console.log("questions", questions);
       for (const eachobj of questions) {
@@ -206,7 +245,40 @@ const GeminiAI = () => {
         </motion.div>
 
         <motion.div className="file-section-container" variants={itemVariants}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: '600', color: 'var(--text-secondary)' }}>
+          {classMaterials.length > 0 && (
+            <div className="class-materials-section">
+              <label className="section-label">
+                <FolderOpenIcon fontSize="small" /> Class Materials
+              </label>
+              <div className="materials-list">
+                {classMaterials.map((mat, idx) => {
+                  const isSelected = selectedMaterialIds.includes(`s3://${import.meta.env.VITE_BUCKET_NAME}/${mat.objectKey || mat.file}`);
+                  return (
+                    <div
+                      key={idx}
+                      className={`material-item ${isSelected ? 'selected' : ''}`}
+                      onClick={() => handleMaterialToggle(mat)}
+                    >
+                      <input
+                        type="checkbox"
+                        className="material-checkbox"
+                        checked={isSelected}
+                        onChange={() => { }} /* Handled by parent div click */
+                      />
+                      <div className="material-info">
+                        <span className="material-title" title={mat.title}>{mat.title}</span>
+                        <span className="material-group">
+                          From: {mat.groupName}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <label className="section-label">
             <CloudUploadIcon fontSize="small" /> Upload Secret Materials (These materials won't be visible in Class Materials but considered for generating exam questions)
           </label>
           <div className="file-upload-box">
