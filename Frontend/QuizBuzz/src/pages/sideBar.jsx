@@ -103,7 +103,7 @@ export default function Sidebar() {
           {!isSidebarOpen && (
             <div className="navbar-logo" onClick={() => navigate("/home")}>
               <img src="/icon.png" alt="QuizBuzz" className="nav-logo-img" />
-              <span className="nav-logo-text">QuizBuzz</span>
+              <span className="nav-logo-text">GradeX</span>
             </div>
           )}
         </div>

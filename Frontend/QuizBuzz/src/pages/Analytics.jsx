@@ -55,15 +55,29 @@ const Analytics = () => {
 
           if (resAnswers.data.got) {
             const userAnswers = resAnswers.data.answersq.answersAll;
+            console.log(userAnswers);
 
             let correctCount = 0;
             let obtainedMarks = 0;
             let totalMarks = 0;
             let unattemptedCount = 0;
 
-            fetchedQuestions.forEach((q, i) => {
+            // 1. Merge questions with their corresponding answers
+            const combined = fetchedQuestions.map((q, i) => ({
+              question: q,
+              answer: userAnswers[i]
+            }));
+
+            // 2. Sort by questionNo
+            combined.sort((a, b) => a.question.questionNo - b.question.questionNo);
+
+            // 3. Separate back for processing
+            const sortedQuestions = combined.map(c => c.question);
+            const sortedAnswers = combined.map(c => c.answer);
+
+            sortedQuestions.forEach((q, i) => {
               totalMarks += q.marks;
-              const userAns = userAnswers[i];
+              const userAns = sortedAnswers[i];
 
               if (!userAns || userAns.trim() === "") {
                 unattemptedCount++;
@@ -73,11 +87,11 @@ const Analytics = () => {
               }
             });
 
-            const wrongCount = fetchedQuestions.length - correctCount - unattemptedCount;
-            const accuracy = (correctCount / fetchedQuestions.length) * 100;
+            const wrongCount = sortedQuestions.length - correctCount - unattemptedCount;
+            const accuracy = (correctCount / sortedQuestions.length) * 100;
 
-            setQuestions(fetchedQuestions);
-            setAnswers(userAnswers);
+            setQuestions(sortedQuestions);
+            setAnswers(sortedAnswers);
             setExamDetails(examInfo);
             setUserData(user);
             setStats({
@@ -94,7 +108,7 @@ const Analytics = () => {
             const newAnalytic = {
               examId: examInfo._id,
               examWho: user.username,
-              totalQ: fetchedQuestions.length,
+              totalQ: sortedQuestions.length,
               correctQ: correctCount,
               duration: examInfo.duration,
               marks: obtainedMarks,
