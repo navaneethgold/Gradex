@@ -32,21 +32,27 @@ const sessionOptions = {
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    sameSite: "none",
-    secure: true,
-    domain: "smart-quiz-app-e3c9.onrender.com",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+    domain: process.env.COOKIE_DOMAIN || undefined, // Dynamic domain
     maxAge: 7 * 24 * 60 * 60 * 1000,
   },
 };
+
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://smart-quiz-app-e3c9.onrender.com",   // production
+  process.env.FRONTEND_URL, // Dynamic frontend URL
+  "https://smart-quiz-app-e3c9.onrender.com",
   "https://smart-quiz-app-two.vercel.app"
-]
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
   origin: (origin, callback) => {
     console.log("CORS request from:", origin);
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
