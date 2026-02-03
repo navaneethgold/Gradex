@@ -2,7 +2,6 @@
 
 **GradeX** (formerly QuizBuzz) is a modern, AI-powered educational platform designed to streamline the examination process. It features real-time analytics, AI-assisted question generation, manual exam creation, and a comprehensive student leaderboard.
 
-![GradeX Banner](https://via.placeholder.com/1200x300?text=GradeX+Smart+Quiz+Platform)
 
 ## ✨ Key Features
 
@@ -37,14 +36,15 @@
 *   **Vite**: Next-generation frontend tooling for fast builds.
 *   **Framer Motion**: For smooth, professional animations and transitions.
 *   **Axios**: For efficient HTTP requests to the backend.
-*   **React Toastify**: For elegant user notifications.
-*   **CSS Variables**: For robust theming and consistent styling.
 
 ### Backend
 *   **Node.js & Express**: Robust server-side framework.
 *   **MongoDB & Mongoose**: Flexible NoSQL database for storing user data, exams, and analytics.
 *   **JWT (JSON Web Tokens)**: Secure user authentication and session management.
 *   **Gemini AI API**: For generative AI capabilities.
+
+### Cloud & Deployment
+*   **AWS S3**: For secure and scalable storage.
 
 ---
 
@@ -58,7 +58,7 @@
 
 1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/your-username/smart-quiz-app.git
+    git clone https://github.com/navaneethgold/Gradex.git
     cd smart-quiz-app
     ```
 
@@ -68,9 +68,14 @@
     npm install
     # Create a .env file with:
     # PORT=3000
-    # MONGO_URI=your_mongodb_uri
+    # SECRET=your_session_secret
     # JWT_SECRET=your_jwt_secret
-    # GEMINI_API_KEY=your_gemini_key
+    # MONGO_URI=your_mongodb_uri
+    # GEMINI=your_gemini_api_key
+    # AWS_ACCESS_KEY_ID=your_aws_access_key
+    # AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+    # AWS_REGION=your_aws_region
+    # S3_BUCKET_NAME=your_s3_bucket_name
     npm start
     ```
 
@@ -80,6 +85,7 @@
     npm install
     # Create a .env file with:
     # VITE_API_BASE_URL=http://localhost:3000
+    # VITE_BUCKET_NAME=your_s3_bucket_name
     npm run dev
     ```
 
@@ -99,7 +105,3 @@
 ## 🤝 Contribution
 
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
-
----
-
-**Built with ❤️ by [Your Name]**
