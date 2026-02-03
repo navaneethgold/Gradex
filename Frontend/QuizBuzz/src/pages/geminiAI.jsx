@@ -194,7 +194,7 @@ const GeminiAI = () => {
       <motion.div className="gemini-header" variants={itemVariants}>
         <h2><AutoAwesomeIcon fontSize="large" sx={{ color: '#2563eb' }} /> AI Generator</h2>
         <p className="gemini-description">
-          Define the parameters below and QuizBuzz AI will automatically generate a custom exam for you based on the syllabus provided.
+          Define the parameters below and GradeX AI will automatically generate a custom exam for you based on the syllabus provided.
         </p>
       </motion.div>
 

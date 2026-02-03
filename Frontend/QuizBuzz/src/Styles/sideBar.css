@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-
 /* Variables in App.css */
 
 /* Reset & Base */
@@ -9,6 +7,17 @@
 
 body {
   font-family: 'Outfit', sans-serif;
+}
+
+/* Branding Font */
+.brand-font {
+  font-family: "Imperial Script", cursive !important;
+  font-weight: 700 !important;
+  font-style: normal !important;
+  font-size: 2.2rem !important;
+  /* Increased size for better visibility */
+  /* transform: translateY(4px) !important; */
+  /* Slight adjustment for script alignment */
 }
 
 /* ----------------- 
@@ -75,7 +84,7 @@ body {
   font-family: 'Outfit', sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-primary2);
   letter-spacing: -0.5px;
   opacity: 1;
   transition: opacity 0.2s ease;
@@ -279,10 +288,7 @@ body {
 }
 
 .nav-logo-text {
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-primary2);
   letter-spacing: -0.5px;
 }
 

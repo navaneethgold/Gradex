@@ -8,6 +8,7 @@
   /* Pure white for cards */
 
   --text-primary: #0f172a;
+  --text-primary2: #6366F1;
   --text-secondary: #64748b;
 
   /* Accent Colors */
@@ -48,6 +49,7 @@
   --bg-secondary: #1e293b;
 
   --text-primary: #f8fafc;
+  --text-primary2: #f8fafc;
   --text-secondary: #94a3b8;
 
   --accent-color: #6366f1;

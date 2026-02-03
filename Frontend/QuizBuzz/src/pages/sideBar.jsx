@@ -102,8 +102,8 @@ export default function Sidebar() {
           {/* Logo in Navbar when Sidebar is Closed (Desktop) or always on Mobile if sidebar closed */}
           {!isSidebarOpen && (
             <div className="navbar-logo" onClick={() => navigate("/home")}>
-              <img src="/icon.png" alt="QuizBuzz" className="nav-logo-img" />
-              <span className="nav-logo-text">GradeX</span>
+              {/* <img src="/icon.png" alt="GradeX" className="nav-logo-img" /> */}
+              <span className="nav-logo-text brand-font">GradeX</span>
             </div>
           )}
         </div>
@@ -148,12 +148,12 @@ export default function Sidebar() {
             <div
               className="header-content visible"
               onClick={() => navigate("/home")}
-              style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+              style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
             >
-              <div className="logo-container">
-                <img src="/icon.png" alt="QuizBuzz Logo" className="logo-img" />
-              </div>
-              <h1 className="logo-text">QuizBuzz</h1>
+              {/* <div className="logo-container">
+                <img src="/icon.png" alt="GradeX Logo" className="logo-img" />
+              </div> */}
+              <h1 className="logo-text brand-font">GradeX</h1>
             </div>
           )}
 
