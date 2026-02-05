@@ -52,7 +52,7 @@ const Login = () => {
       {/* Left Side (Image & Branding) */}
       <div className="login-left">
         <div className="login-branding">
-          <h1 className="brand-tagline">Unlock Your<br />Knowledge</h1>
+          <h1 className="brand-tagline">GradeX</h1>
           <p className="brand-desc">Join our smart quiz platform to test your skills, compete with others, and learn faster using AI-generated exams.</p>
         </div>
       </div>

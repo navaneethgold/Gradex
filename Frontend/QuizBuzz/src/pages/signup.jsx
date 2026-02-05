@@ -119,8 +119,8 @@ const Signup = () => {
       {/* Left Side (Image & Branding) */}
       <div className="signup-left">
         <div className="signup-branding">
-          <h1 className="brand-tagline">Join the<br />Community</h1>
-          <p className="brand-desc">Create your account to start generating exams, tracking your progress, and challenging your peers today.</p>
+          <h1 className="brand-tagline">GradeX</h1>
+          <p className="brand-desc">Join our smart quiz platform to test your skills, compete with others, and learn faster using AI-generated exams.</p>
         </div>
       </div>
 
