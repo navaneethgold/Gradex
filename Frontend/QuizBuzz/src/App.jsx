@@ -16,6 +16,8 @@ import Profile from "./pages/profile";
 import GeminiAI from "./pages/geminiAI";
 import Settings from "./pages/settings";
 
+import LandingPage from "./pages/LandingPage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -23,10 +25,17 @@ function App() {
         <Route path="/signUp" element={<Signup />} />
         <Route path="/login" element={<Login />} />
 
+        {/* Landing Page at Root */}
+        <Route index element={<LandingPage />} />
+
         {/* Layout-wrapped routes */}
         <Route path="/" element={<Layout />}>
-          {/* Redirect from "/" to "/home" */}
-          <Route index element={<Navigate to="/home" />} />
+          {/* Redirect from "/" to "/home" removed, Layout routes start here */}
+          {/* Note: Layout renders <Outlet /> so nested routes work. 
+              Since "/" is now LandingPage (outside Layout logic above if we want heavy separation, 
+              but here it is inside? No, let's restructure slightly to ensure LandingPage has no Sidebar) 
+          */}
+
 
           <Route path="/home" element={<Home />} />
           <Route path="/groups" element={<Groups />} />
