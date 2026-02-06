@@ -19,6 +19,8 @@ import analytic from './models/analytics.js';
 import AIQuestionRoute from "./routes/gemini.js"
 import fileRoute from "./routes/fileRoutes/file.js";
 import examRoutes from "./routes/examRoutes.js";
+import groupRoutes from "./routes/group.js";
+
 dotenv.config();
 const app = express();
 const server = createServer(app);
@@ -74,6 +76,7 @@ async function main() {
 app.use("/", AIQuestionRoute);
 app.use("/api/upload", fileRoute);
 app.use("/api/exams", examRoutes);
+app.use("/api/groups", groupRoutes);
 
 app.post("/signUp", async (req, res) => {
   try {

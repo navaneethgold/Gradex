@@ -209,6 +209,27 @@ export default function Pgroup() {
     navigate('/groups');
   }
 
+  const handleDeleteMaterial = async (materialId) => {
+    if (!confirm("Are you sure you want to delete this material?")) return;
+
+    try {
+      const res = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/api/groups/${id}/materials/${materialId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (res.data.deleted) {
+        setFlash({ message: "Material deleted successfully", type: "success" });
+        fetchGroup(); // Refresh list
+      } else {
+        setFlash({ message: "Failed to delete material", type: "error" });
+      }
+    } catch (err) {
+      console.error("Delete Material Error:", err);
+      setFlash({ message: "Error deleting material", type: "error" });
+    }
+  };
+
   // Animation Variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -354,6 +375,20 @@ export default function Pgroup() {
                                 </span>
                               </div>
                             </div>
+
+                            {/* Delete Option (Creator Only) */}
+                            {currentUser && group.createdBy === currentUser.username && (
+                              <motion.button
+                                onClick={() => handleDeleteMaterial(mat._id)}
+                                className="btn-remove-member"
+                                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
+                                whileHover={{ color: "#ef4444", scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                                title="Delete Material"
+                              >
+                                <DeleteOutlineIcon fontSize="small" />
+                              </motion.button>
+                            )}
                           </div>
                         ))
                       ) : (
