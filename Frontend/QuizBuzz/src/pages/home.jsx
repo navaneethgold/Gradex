@@ -73,7 +73,7 @@ const Home = () => {
     const fetchExams = async () => {
       if (!userData?.username) return;
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/home/getExams/${userData.username}`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/exams/user/${userData.username}`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ const Home = () => {
 
   useEffect(() => {
     const getAllAnalytics = async () => {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/getAllAnalytics`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/analytics/all`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -107,7 +107,7 @@ const Home = () => {
   }, []);
 
   const startExam = async (name) => {
-    await axios.put(`${import.meta.env.VITE_API_BASE_URL}/${name}/setEnd`, {}, {
+    await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${name}/start`, {}, {
       withCredentials: true,
       headers: {
         Authorization: `Bearer ${token}`,

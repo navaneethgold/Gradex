@@ -22,7 +22,7 @@ const Groups = () => {
 
   const fetchGroups = useCallback(async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/groups/getAll`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/groups/all`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`
@@ -57,7 +57,7 @@ const Groups = () => {
     if (!group.trim()) return;
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/groups/new/${group}`, {}, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/groups/create`, { groupName: group }, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`

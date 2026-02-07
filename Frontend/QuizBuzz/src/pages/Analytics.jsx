@@ -38,7 +38,7 @@ const Analytics = () => {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const resQuestions = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/${exam}/getQuestions`, {
+        const resQuestions = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${exam}/questions`, {
           withCredentials: true,
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -48,7 +48,7 @@ const Analytics = () => {
           const examInfo = resQuestions.data.Nowexam;
           const user = resQuestions.data.puser;
 
-          const resAnswers = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/${examInfo.examName}/getAnswers`, {
+          const resAnswers = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${examInfo.examName}/answers`, {
             withCredentials: true,
             headers: { Authorization: `Bearer ${token}` },
           });
@@ -115,7 +115,7 @@ const Analytics = () => {
               unattempted: unattemptedCount,
             };
 
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/postAnalytics`, { newana: newAnalytic }, {
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/analytics/create`, { newana: newAnalytic }, {
               withCredentials: true,
               headers: { Authorization: `Bearer ${token}` }
             });

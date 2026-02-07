@@ -33,7 +33,7 @@ const ExamStart = () => {
 
     const getQuestions = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/${name}/getQuestions`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${name}/questions`, {
           withCredentials: true,
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -128,13 +128,13 @@ const ExamStart = () => {
 
     try {
       console.log(answers);
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/${name}/submitAnswers`, { answers }, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${name}/submit`, { answers }, {
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}` }
       });
 
       if (res.data.sub) {
-        const res2 = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/${name}/submitted`, {}, {
+        const res2 = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${name}/finish`, {}, {
           withCredentials: true,
           headers: { Authorization: `Bearer ${token}` }
         });

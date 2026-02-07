@@ -31,7 +31,7 @@ export default function Pgroup() {
 
   const fetchGroup = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/groups/${id}`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/groups/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -48,7 +48,7 @@ export default function Pgroup() {
 
   useEffect(() => {
     fetchGroup();
-    fetchGroup();
+    // fetchGroup(); // Duplicate call removed
     checkAuth();
   }, [id]);
 
@@ -138,8 +138,8 @@ export default function Pgroup() {
         file: objectKey || ""
       };
 
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/groups/${id}/addMaterial`,
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/groups/${id}/materials`, // Changed PUT to POST
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -161,7 +161,7 @@ export default function Pgroup() {
   const handleAddMember = async () => {
     if (!newMember.trim()) return;
     try {
-      const res = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/groups/${id}/addmem`,
+      const res = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/groups/${id}/members`,
         { email: newMember },
         {
           headers: {
@@ -181,11 +181,11 @@ export default function Pgroup() {
 
   const handleRemoveMember = async (member) => {
     try {
-      const res = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/groups/${id}/removemem`,
-        { part: member },
+      const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/groups/${id}/members`,
         {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
+          data: { part: member } // Send body in data property for DELETE
         }
       );
       if (res.data.removed) {

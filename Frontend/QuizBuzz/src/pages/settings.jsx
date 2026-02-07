@@ -21,7 +21,7 @@ const Settings = () => {
     const deleteorganQuizHistory = async () => {
         if (!confirm("Are you sure you want to delete all organized quizzes? This cannot be undone.")) return;
         try {
-            const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteOrganQuizes`, {
+            const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/user/organized-exams`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -42,7 +42,7 @@ const Settings = () => {
     const deleteCreatedGroups = async () => {
         if (!confirm("Are you sure you want to delete all created groups? This cannot be undone.")) return;
         try {
-            const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteCreatedGroups`, {
+            const res = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/user/created-groups`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -63,15 +63,15 @@ const Settings = () => {
     const deleteAcc = async () => {
         if (!confirm("Are you sure you want to delete your account? This action is irreversible.")) return;
         try {
-            const res1 = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteOrganQuizes`, {
+            const res1 = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/user/organized-exams`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${token}` }
             });
-            const res2 = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteCreatedGroups`, {
+            const res2 = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/user/created-groups`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${token}` }
             });
-            const res3 = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/deleteAccount`, {
+            const res3 = await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/user/account`, {
                 withCredentials: true,
                 headers: { Authorization: `Bearer ${token}` }
             });

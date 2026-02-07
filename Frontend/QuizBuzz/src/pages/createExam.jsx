@@ -22,7 +22,7 @@ const CreateExam = () => {
 
     const fetchGroups = useCallback(async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/groups/getAdmins`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/groups/admin`, {
                 withCredentials: true,
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -60,7 +60,7 @@ const CreateExam = () => {
     const handleProceeding = async () => {
         if (checked.length > 0 && exam && totalTime > 0) {
             try {
-                const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/create-new-exam`, {
+                const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/exams/create`, {
                     groups: checked,
                     examName: exam,
                     duration: totalTime,
@@ -94,7 +94,7 @@ const CreateExam = () => {
     const handleAI = async () => {
         if (checked.length > 0 && exam && totalTime > 0) {
             try {
-                const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/create-new-exam`, {
+                const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/exams/create`, {
                     groups: checked,
                     examName: exam,
                     duration: totalTime,

@@ -155,7 +155,7 @@ const CreateInterface = () => {
     setSavingStatus(prev => ({ ...prev, [index]: true }));
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/create-new-exam/${examId}/create-question`, { payload }, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${examId}/questions`, { payload }, {
         withCredentials: true
       });
       if (res.data.created) {

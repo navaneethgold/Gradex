@@ -23,7 +23,7 @@ const LeaderBoard = () => {
     const getLeader = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/${exam}/analytics/leaderboard`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/analytics/${exam}/leaderboard`,
           {
             withCredentials: true,
             headers: { Authorization: `Bearer ${token}` },

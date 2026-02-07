@@ -23,7 +23,7 @@ const GroupChat = () => {
   useEffect(() => {
     const getmsgs = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/groups/${id}/fetchgroupChat`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/groups/${id}/chat`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`
@@ -102,7 +102,7 @@ const GroupChat = () => {
     setnewMsg("");
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/groups/${id}/addmsg`, { newtxt2 }, {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/groups/${id}/chat`, { newtxt2 }, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`

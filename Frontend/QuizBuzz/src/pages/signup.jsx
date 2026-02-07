@@ -76,7 +76,7 @@ const Signup = () => {
     }
 
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/signUp`, {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/signup`, {
         username: formData.username,
         email: formData.email,
         password: formData.password
@@ -89,7 +89,7 @@ const Signup = () => {
         return;
       }
 
-      const res2 = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/login`, {
+      const res2 = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
         username: formData.username,
         password: formData.password
       }, {

@@ -23,14 +23,14 @@ const Profile = () => {
 
   const getProfile = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/getProfile`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/user/profile`, {
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.got) {
         setUserData(res.data.profile);
         setisLogged(true);
-        const res2 = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/home/getExams/${res.data.profile.username}`, {
+        const res2 = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/exams/user/${res.data.profile.username}`, {
           withCredentials: true,
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -51,7 +51,7 @@ const Profile = () => {
 
   const startExam = async (name) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/${name}/setEnd`, {}, {
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${name}/start`, {}, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -166,7 +166,7 @@ const Profile = () => {
                     ) : (
                       <button
                         className="btn-start-exam"
-                        onClick={() => startExam(exam.examName)}
+                        onClick={() => startExam(exam._id)}
                       >
                         <PlayArrowIcon /> Start Exam
                       </button>

@@ -147,8 +147,9 @@ const GeminiAI = () => {
           ...eachobj,
           marks: Number(maxMarks) / Number(noQuestions)
         };
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/create-new-exam/${examId}/create-question`, { payload: questionPayload }, {
-          withCredentials: true
+        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/exams/${examId}/questions`, { payload: questionPayload }, {
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` }
         });
       }
       setshow(true);
