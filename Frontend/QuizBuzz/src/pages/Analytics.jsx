@@ -133,7 +133,7 @@ const Analytics = () => {
 
   if (loading) {
     return (
-      <div className="analytics-page-container center-content">
+      <div className="analytics-page-container analytics-center-content">
         <motion.h2 animate={{ opacity: [0.5, 1, 0.5] }} transition={{ repeat: Infinity, duration: 1.5 }}>
           Loading Analytics...
         </motion.h2>
@@ -142,7 +142,7 @@ const Analytics = () => {
   }
 
   if (!examDetails || !userData) {
-    return <div className="analytics-page-container center-content"><h2>Error loading analytics data.</h2></div>;
+    return <div className="analytics-page-container analytics-center-content"><h2>Error loading analytics data.</h2></div>;
   }
 
   const percentage = (stats.obtainedMarks / stats.totalMarks) * 100;
@@ -176,15 +176,15 @@ const Analytics = () => {
     >
       {/* Header */}
       <motion.div className="analytics-header" variants={itemVariants}>
-        <div className="header-info">
+        <div className="analytics-header-info">
           <h1><AssessmentIcon fontSize="large" sx={{ color: 'var(--accent-color)' }} /> Exam Results</h1>
           <p><strong>{examDetails.examName}</strong> • {userData.username}</p>
         </div>
-        <div className="header-actions">
-          <button className="primary-btn" onClick={() => navigate(`/${examDetails._id}/analytics/leaderboard`)}>
+        <div className="analytics-header-actions">
+          <button className="analytics-primary-btn" onClick={() => navigate(`/${examDetails._id}/analytics/leaderboard`)}>
             <LeaderboardIcon fontSize="small" /> Leaderboard
           </button>
-          <button className="secondary-btn" onClick={() => navigate('/home')}>
+          <button className="analytics-secondary-btn" onClick={() => navigate('/home')}>
             <HomeIcon fontSize="small" /> Home
           </button>
         </div>
@@ -192,9 +192,9 @@ const Analytics = () => {
 
       <motion.div className="analytics-dashboard" variants={itemVariants}>
         {/* Score Card */}
-        <div className="score-card">
+        <div className="analytics-score-card">
           <h3>Performance Overview</h3>
-          <div className="score-chart-container">
+          <div className="analytics-score-chart-container">
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
                 <Pie
@@ -217,13 +217,13 @@ const Analytics = () => {
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
-            <div className="score-center-text">
-              <span className="percentage">{Math.round(percentage)}%</span>
-              <span className="label">Score</span>
+            <div className="analytics-score-center-text">
+              <span className="analytics-percentage">{Math.round(percentage)}%</span>
+              <span className="analytics-label">Score</span>
             </div>
           </div>
-          <div className="score-summary">
-            <p className="marks-display">{stats.obtainedMarks} / {stats.totalMarks} Marks</p>
+          <div className="analytics-score-summary">
+            <p className="analytics-marks-display">{stats.obtainedMarks} / {stats.totalMarks} Marks</p>
             <p style={{ color: percentage >= 50 ? '#10b981' : '#ef4444', fontWeight: '600' }}>
               {percentage >= 50 ? "Excellent Work!" : "Keep Practicing"}
             </p>
@@ -231,20 +231,20 @@ const Analytics = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="stats-grid">
-          <div className="stat-card correct">
+        <div className="analytics-stats-grid">
+          <div className="analytics-stat-card analytics-correct">
             <h4>Correct</h4>
             <p>{stats.correctCount}</p>
           </div>
-          <div className="stat-card wrong">
+          <div className="analytics-stat-card analytics-wrong">
             <h4>Wrong</h4>
             <p>{stats.wrongCount}</p>
           </div>
-          <div className="stat-card unattempted">
+          <div className="analytics-stat-card analytics-unattempted">
             <h4>Unattempted</h4>
             <p>{stats.unattemptedCount}</p>
           </div>
-          <div className="stat-card time">
+          <div className="analytics-stat-card analytics-time">
             <h4>Accuracy</h4>
             <p>{stats.accuracy}%</p>
           </div>
@@ -252,40 +252,40 @@ const Analytics = () => {
       </motion.div>
 
       {/* Question Analysis */}
-      <motion.div className="analysis-section" variants={itemVariants}>
+      <motion.div className="analytics-analysis-section" variants={itemVariants}>
         <h2>Question Analysis</h2>
-        <div className="question-review-list">
+        <div className="analytics-question-review-list">
           {questions.map((q, idx) => {
             const userAns = answers[idx];
             const isCorrect = userAns && userAns.trim().toLowerCase() === q.qAnswer.trim().toLowerCase();
             const isUnattempted = !userAns || userAns.trim() === "";
 
-            let statusClass = "wrong";
+            let statusClass = "analytics-wrong";
             let statusText = "Wrong";
-            if (isCorrect) { statusClass = "correct"; statusText = "Correct"; }
-            else if (isUnattempted) { statusClass = "unattempted"; statusText = "Skipped"; }
+            if (isCorrect) { statusClass = "analytics-correct"; statusText = "Correct"; }
+            else if (isUnattempted) { statusClass = "analytics-unattempted"; statusText = "Skipped"; }
 
             return (
               <motion.div
                 key={q._id}
-                className={`review-item ${statusClass}-border`}
+                className={`analytics-review-item ${statusClass}-border`}
                 variants={itemVariants}
               >
-                <div className="review-header">
-                  <span className="q-number">Question {q.questionNo}</span>
-                  <span className={`q-status ${statusClass}`}>{statusText}</span>
+                <div className="analytics-review-header">
+                  <span className="analytics-q-number">Question {q.questionNo}</span>
+                  <span className={`analytics-q-status ${statusClass}`}>{statusText}</span>
                 </div>
-                <div className="review-question">{q.question}</div>
-                <div className="review-answers">
-                  <div className={`ans-block ${isCorrect ? 'user-correct-bg' : 'user-wrong-bg'}`}>
-                    <span className="ans-label">Your Answer</span>
-                    <span className="ans-text">
+                <div className="analytics-review-question">{q.question}</div>
+                <div className="analytics-review-answers">
+                  <div className={`analytics-ans-block ${isCorrect ? 'analytics-user-correct-bg' : 'analytics-user-wrong-bg'}`}>
+                    <span className="analytics-ans-label">Your Answer</span>
+                    <span className="analytics-ans-text">
                       {isUnattempted ? "Not Attempted" : userAns}
                     </span>
                   </div>
-                  <div className="ans-block correct-bg">
-                    <span className="ans-label">Correct Answer</span>
-                    <span className="ans-text">{q.qAnswer}</span>
+                  <div className="analytics-ans-block analytics-correct-bg">
+                    <span className="analytics-ans-label">Correct Answer</span>
+                    <span className="analytics-ans-text">{q.qAnswer}</span>
                   </div>
                 </div>
               </motion.div>
